@@ -3,7 +3,7 @@ init:
   - git config --global core.autocrlf input
 
 image:
-- Visual Studio 2017
+  - Visual Studio 2017
 
 # Test against these versions of Node.js.
 environment:
@@ -12,14 +12,14 @@ environment:
     - nodejs_version: "12"
     - nodejs_version: "10"
     - nodejs_version: "8"
-    
+
 matrix:
   fast_finish: true
 
 # Install scripts. (runs after repo cloning)
 install:
   - ps: Install-Product node $env:nodejs_version
-  
+
 before_test:
   - npm install
 
