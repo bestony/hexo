@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const { join } = require('path');
-const { mkdirs, rmdir, writeFile } = require('hexo-fs');
-const moment = require('moment');
-const { spy } = require('sinon');
+const { join } = require("path");
+const { mkdirs, rmdir, writeFile } = require("hexo-fs");
+const moment = require("moment");
+const { spy } = require("sinon");
 
-describe('View', () => {
-  const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(join(__dirname, 'theme_test'));
-  const themeDir = join(hexo.base_dir, 'themes', 'test');
+describe("View", () => {
+  const Hexo = require("../../../lib/hexo");
+  const hexo = new Hexo(join(__dirname, "theme_test"));
+  const themeDir = join(hexo.base_dir, "themes", "test");
   const { compile } = Object.assign({}, hexo.extend.renderer.store.swig);
 
   hexo.env.init = true;
@@ -20,15 +20,11 @@ describe('View', () => {
   before(async () => {
     await Promise.all([
       mkdirs(themeDir),
-      writeFile(hexo.config_path, 'theme: test')
+      writeFile(hexo.config_path, "theme: test")
     ]);
     await hexo.init();
     // Setup layout
-    hexo.theme.setView('layout.swig', [
-      'pre',
-      '{{ body }}',
-      'post'
-    ].join('\n'));
+    hexo.theme.setView("layout.swig", ["pre", "{{ body }}", "post"].join("\n"));
   });
 
   beforeEach(() => {
@@ -38,266 +34,199 @@ describe('View', () => {
 
   after(() => rmdir(hexo.base_dir));
 
-  it('constructor', () => {
-    const data = {
-      _content: ''
-    };
-    const view = newView('index.swig', data);
+  it("constructor", () => {
+    const data = { _content: "" };
+    const view = newView("index.swig", data);
 
-    view.path.should.eql('index.swig');
-    view.source.should.eql(join(themeDir, 'layout', 'index.swig'));
+    view.path.should.eql("index.swig");
+    view.source.should.eql(join(themeDir, "layout", "index.swig"));
     view.data.should.eql(data);
   });
 
-  it('parse front-matter', () => {
-    const body = [
-      'layout: false',
-      '---',
-      'content'
-    ].join('\n');
+  it("parse front-matter", () => {
+    const body = ["layout: false", "---", "content"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    view.data.should.eql({
-      layout: false,
-      _content: 'content'
-    });
+    view.data.should.eql({ layout: false, _content: "content" });
   });
 
-  it('precompile view if possible', async () => {
-    const body = 'Hello {{ name }}';
-    const view = newView('index.swig', body);
+  it("precompile view if possible", async () => {
+    const body = "Hello {{ name }}";
+    const view = newView("index.swig", body);
 
-    view._compiledSync({
-      name: 'Hexo'
-    }).should.eql('Hello Hexo');
+    view._compiledSync({ name: "Hexo" }).should.eql("Hello Hexo");
 
-    const result = await view._compiled({
-      name: 'Hexo'
-    });
-    result.should.eql('Hello Hexo');
+    const result = await view._compiled({ name: "Hexo" });
+    result.should.eql("Hello Hexo");
   });
 
-  it('generate precompiled function even if renderer does not provide compile function', async () => {
+  it("generate precompiled function even if renderer does not provide compile function", async () => {
     // Remove compile function
     delete hexo.extend.renderer.store.swig.compile;
 
-    const body = 'Hello {{ name }}';
-    const view = newView('index.swig', body);
+    const body = "Hello {{ name }}";
+    const view = newView("index.swig", body);
 
-    view._compiledSync({
-      name: 'Hexo'
-    }).should.eql('Hello Hexo');
+    view._compiledSync({ name: "Hexo" }).should.eql("Hello Hexo");
 
-    const result = await view._compiled({
-      name: 'Hexo'
-    });
-    result.should.eql('Hello Hexo');
+    const result = await view._compiled({ name: "Hexo" });
+    result.should.eql("Hello Hexo");
   });
 
-  it('render()', async () => {
-    const body = [
-      '{{ test }}'
-    ].join('\n');
+  it("render()", async () => {
+    const body = ["{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    const content = await view.render({
-      test: 'foo'
-    });
-    content.should.eql('foo');
+    const content = await view.render({ test: "foo" });
+    content.should.eql("foo");
   });
 
-  it('render() - front-matter', async () => {
+  it("render() - front-matter", async () => {
     // The priority of front-matter is higher
-    const body = [
-      'foo: bar',
-      '---',
-      '{{ foo }}',
-      '{{ test }}'
-    ].join('\n');
+    const body = ["foo: bar", "---", "{{ foo }}", "{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    const content = await view.render({
-      foo: 'foo',
-      test: 'test'
-    });
-    content.should.eql('bar\ntest');
+    const content = await view.render({ foo: "foo", test: "test" });
+    content.should.eql("bar\ntest");
   });
 
-  it('render() - helper', async () => {
-    const body = [
-      '{{ date() }}'
-    ].join('\n');
+  it("render() - helper", async () => {
+    const body = ["{{ date() }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    const content = await view.render({
-      config: hexo.config,
-      page: {}
-    });
+    const content = await view.render({ config: hexo.config, page: {} });
     content.should.eql(moment().format(hexo.config.date_format));
   });
 
-  it('render() - layout', async () => {
-    const body = 'content';
-    const view = newView('index.swig', body);
+  it("render() - layout", async () => {
+    const body = "content";
+    const view = newView("index.swig", body);
 
-    const content = await view.render({
-      layout: 'layout'
-    });
-    content.should.eql('pre\n' + body + '\npost');
+    const content = await view.render({ layout: "layout" });
+    content.should.eql("pre\n" + body + "\npost");
   });
 
-  it('render() - layout not found', async () => {
-    const body = 'content';
-    const view = newView('index.swig', body);
+  it("render() - layout not found", async () => {
+    const body = "content";
+    const view = newView("index.swig", body);
 
-    const content = await view.render({
-      layout: 'wtf'
-    });
+    const content = await view.render({ layout: "wtf" });
     content.should.eql(body);
   });
 
-  it('render() - callback', callback => {
-    const body = [
-      '{{ test }}'
-    ].join('\n');
+  it("render() - callback", callback => {
+    const body = ["{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    view.render({
-      test: 'foo'
-    }, (err, content) => {
+    view.render({ test: "foo" }, (err, content) => {
       should.not.exist(err);
-      content.should.eql('foo');
+      content.should.eql("foo");
       callback();
     });
   });
 
-  it('render() - callback (without options)', callback => {
-    const body = [
-      'test: foo',
-      '---',
-      '{{ test }}'
-    ].join('\n');
+  it("render() - callback (without options)", callback => {
+    const body = ["test: foo", "---", "{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
     view.render((err, content) => {
       should.not.exist(err);
-      content.should.eql('foo');
+      content.should.eql("foo");
       callback();
     });
   });
 
-  it('render() - execute after_render:html', async () => {
-    const body = [
-      '{{ test }}'
-    ].join('\n');
+  it("render() - execute after_render:html", async () => {
+    const body = ["{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
     const filter = spy(result => {
-      result.should.eql('foo');
-      return 'bar';
+      result.should.eql("foo");
+      return "bar";
     });
 
-    hexo.extend.filter.register('after_render:html', filter);
+    hexo.extend.filter.register("after_render:html", filter);
 
-    const content = await view.render({
-      test: 'foo'
-    });
-    content.should.eql('bar');
+    const content = await view.render({ test: "foo" });
+    content.should.eql("bar");
 
-    hexo.extend.filter.unregister('after_render:html', filter);
+    hexo.extend.filter.unregister("after_render:html", filter);
   });
 
-  it('renderSync()', () => {
-    const body = [
-      '{{ test }}'
-    ].join('\n');
+  it("renderSync()", () => {
+    const body = ["{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
-    view.renderSync({test: 'foo'}).should.eql('foo');
+    const view = newView("index.swig", body);
+    view.renderSync({ test: "foo" }).should.eql("foo");
   });
 
-  it('renderSync() - front-matter', () => {
+  it("renderSync() - front-matter", () => {
     // The priority of front-matter is higher
-    const body = [
-      'foo: bar',
-      '---',
-      '{{ foo }}',
-      '{{ test }}'
-    ].join('\n');
+    const body = ["foo: bar", "---", "{{ foo }}", "{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    view.renderSync({
-      foo: 'foo',
-      test: 'test'
-    }).should.eql('bar\ntest');
+    view.renderSync({ foo: "foo", test: "test" }).should.eql("bar\ntest");
   });
 
-  it('renderSync() - helper', () => {
-    const body = [
-      '{{ date() }}'
-    ].join('\n');
+  it("renderSync() - helper", () => {
+    const body = ["{{ date() }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
-    view.renderSync({
-      config: hexo.config,
-      page: {}
-    }).should.eql(moment().format(hexo.config.date_format));
+    view
+      .renderSync({ config: hexo.config, page: {} })
+      .should.eql(moment().format(hexo.config.date_format));
   });
 
-  it('renderSync() - layout', () => {
-    const body = 'content';
-    const view = newView('index.swig', body);
+  it("renderSync() - layout", () => {
+    const body = "content";
+    const view = newView("index.swig", body);
 
-    view.renderSync({
-      layout: 'layout'
-    }).should.eql('pre\n' + body + '\npost');
+    view.renderSync({ layout: "layout" }).should.eql("pre\n" + body + "\npost");
   });
 
-  it('renderSync() - layout not found', () => {
-    const body = 'content';
-    const view = newView('index.swig', body);
+  it("renderSync() - layout not found", () => {
+    const body = "content";
+    const view = newView("index.swig", body);
 
-    view.renderSync({
-      layout: 'wtf'
-    }).should.eql(body);
+    view.renderSync({ layout: "wtf" }).should.eql(body);
   });
 
-  it('renderSync() - execute after_render:html', () => {
-    const body = [
-      '{{ test }}'
-    ].join('\n');
+  it("renderSync() - execute after_render:html", () => {
+    const body = ["{{ test }}"].join("\n");
 
-    const view = newView('index.swig', body);
+    const view = newView("index.swig", body);
 
     const filter = spy(result => {
-      result.should.eql('foo');
-      return 'bar';
+      result.should.eql("foo");
+      return "bar";
     });
 
-    hexo.extend.filter.register('after_render:html', filter);
-    view.renderSync({test: 'foo'}).should.eql('bar');
-    hexo.extend.filter.unregister('after_render:html', filter);
+    hexo.extend.filter.register("after_render:html", filter);
+    view.renderSync({ test: "foo" }).should.eql("bar");
+    hexo.extend.filter.unregister("after_render:html", filter);
   });
 
-  it('_resolveLayout()', () => {
-    const view = newView('partials/header.swig', 'header');
+  it("_resolveLayout()", () => {
+    const view = newView("partials/header.swig", "header");
 
     // Relative path
-    view._resolveLayout('../layout').should.have.property('path', 'layout.swig');
+    view
+      ._resolveLayout("../layout")
+      .should.have.property("path", "layout.swig");
 
     // Absolute path
-    view._resolveLayout('layout').should.have.property('path', 'layout.swig');
+    view._resolveLayout("layout").should.have.property("path", "layout.swig");
 
     // Can't be itself
-    should.not.exist(view._resolveLayout('header'));
+    should.not.exist(view._resolveLayout("header"));
   });
 });

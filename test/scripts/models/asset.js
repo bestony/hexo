@@ -1,45 +1,37 @@
-'use strict';
+"use strict";
 
-const { join } = require('path');
+const { join } = require("path");
 
-describe('Asset', () => {
-  const Hexo = require('../../../lib/hexo');
+describe("Asset", () => {
+  const Hexo = require("../../../lib/hexo");
   const hexo = new Hexo();
-  const Asset = hexo.model('Asset');
+  const Asset = hexo.model("Asset");
 
-  it('default values', async () => {
-    const data = await Asset.insert({
-      _id: 'foo',
-      path: 'bar'
-    });
+  it("default values", async () => {
+    const data = await Asset.insert({ _id: "foo", path: "bar" });
     data.modified.should.eql(true);
 
     Asset.removeById(data._id);
   });
 
-  it('_id - required', async () => {
+  it("_id - required", async () => {
     try {
       await Asset.insert({});
     } catch (err) {
-      err.message.should.eql('ID is not defined');
+      err.message.should.eql("ID is not defined");
     }
   });
 
-  it('path - required', async () => {
+  it("path - required", async () => {
     try {
-      await Asset.insert({
-        _id: 'foo'
-      });
+      await Asset.insert({ _id: "foo" });
     } catch (err) {
-      err.message.should.eql('`path` is required!');
+      err.message.should.eql("`path` is required!");
     }
   });
 
-  it('source - virtual', async () => {
-    const data = await Asset.insert({
-      _id: 'foo',
-      path: 'bar'
-    });
+  it("source - virtual", async () => {
+    const data = await Asset.insert({ _id: "foo", path: "bar" });
     data.source.should.eql(join(hexo.base_dir, data._id));
 
     Asset.removeById(data._id);
