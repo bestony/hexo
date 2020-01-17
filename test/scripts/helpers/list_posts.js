@@ -5,9 +5,7 @@ describe('list_posts', () => {
   const hexo = new Hexo(__dirname);
   const Post = hexo.model('Post');
 
-  const ctx = {
-    config: hexo.config
-  };
+  const ctx = {config : hexo.config};
 
   ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
 
@@ -18,9 +16,9 @@ describe('list_posts', () => {
   before(async () => {
     await hexo.init();
     await Post.insert([
-      {source: 'foo', slug: 'foo', title: 'Its', date: 1e8},
-      {source: 'bar', slug: 'bar', title: 'Chemistry', date: 1e8 + 1},
-      {source: 'baz', slug: 'baz', title: 'Bitch', date: 1e8 - 1}
+      {source : 'foo', slug : 'foo', title : 'Its', date : 1e8},
+      {source : 'bar', slug : 'bar', title : 'Chemistry', date : 1e8 + 1},
+      {source : 'baz', slug : 'baz', title : 'Bitch', date : 1e8 - 1}
     ]);
 
     hexo.locals.invalidate();
@@ -40,9 +38,7 @@ describe('list_posts', () => {
   });
 
   it('specified collection', () => {
-    const result = listPosts(Post.find({
-      title: 'Its'
-    }));
+    const result = listPosts(Post.find({title : 'Its'}));
 
     result.should.eql([
       '<ul class="post-list">',
@@ -52,9 +48,7 @@ describe('list_posts', () => {
   });
 
   it('style: false', () => {
-    const result = listPosts({
-      style: false
-    });
+    const result = listPosts({style : false});
 
     result.should.eql([
       '<a class="post-link" href="/bar/">Chemistry</a>',
@@ -64,9 +58,7 @@ describe('list_posts', () => {
   });
 
   it('orderby', () => {
-    const result = listPosts({
-      orderby: 'title'
-    });
+    const result = listPosts({orderby : 'title'});
 
     result.should.eql([
       '<ul class="post-list">',
@@ -78,9 +70,7 @@ describe('list_posts', () => {
   });
 
   it('order', () => {
-    const result = listPosts({
-      order: 1
-    });
+    const result = listPosts({order : 1});
 
     result.should.eql([
       '<ul class="post-list">',
@@ -92,9 +82,7 @@ describe('list_posts', () => {
   });
 
   it('class', () => {
-    const result = listPosts({
-      class: 'test'
-    });
+    const result = listPosts({class : 'test'});
 
     result.should.eql([
       '<ul class="test-list">',
@@ -106,11 +94,7 @@ describe('list_posts', () => {
   });
 
   it('transform', () => {
-    const result = listPosts({
-      transform(str) {
-        return str.toUpperCase();
-      }
-    });
+    const result = listPosts({transform(str) { return str.toUpperCase(); }});
 
     result.should.eql([
       '<ul class="post-list">',
@@ -122,10 +106,7 @@ describe('list_posts', () => {
   });
 
   it('separator', () => {
-    const result = listPosts({
-      style: false,
-      separator: ''
-    });
+    const result = listPosts({style : false, separator : ''});
 
     result.should.eql([
       '<a class="post-link" href="/bar/">Chemistry</a>',
@@ -135,9 +116,7 @@ describe('list_posts', () => {
   });
 
   it('amount', () => {
-    const result = listPosts({
-      amount: 2
-    });
+    const result = listPosts({amount : 2});
 
     result.should.eql([
       '<ul class="post-list">',

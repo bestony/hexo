@@ -1,18 +1,16 @@
 'use strict';
 
-const { join } = require('path');
-const { mkdirs, rmdir, writeFile } = require('hexo-fs');
+const {join} = require('path');
+const {mkdirs, rmdir, writeFile} = require('hexo-fs');
 
 describe('Theme', () => {
   const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(join(__dirname, 'theme_test'), {silent: true});
+  const hexo = new Hexo(join(__dirname, 'theme_test'), {silent : true});
   const themeDir = join(hexo.base_dir, 'themes', 'test');
 
   before(async () => {
-    await Promise.all([
-      mkdirs(themeDir),
-      writeFile(hexo.config_path, 'theme: test')
-    ]);
+    await Promise.all(
+        [ mkdirs(themeDir), writeFile(hexo.config_path, 'theme: test') ]);
     hexo.init();
   });
 
@@ -36,7 +34,8 @@ describe('Theme', () => {
   it('getView() - escape backslashes', () => {
     hexo.theme.setView('foo/bar.swig', '');
 
-    hexo.theme.getView('foo\\bar.swig').should.have.property('path', 'foo/bar.swig');
+    hexo.theme.getView('foo\\bar.swig')
+        .should.have.property('path', 'foo/bar.swig');
 
     hexo.theme.removeView('foo/bar.swig');
   });

@@ -1,12 +1,12 @@
 'use strict';
 
-const { join } = require('path');
-const { mkdirs, rmdir, unlink, writeFile } = require('hexo-fs');
+const {join} = require('path');
+const {mkdirs, rmdir, unlink, writeFile} = require('hexo-fs');
 const testUtil = require('../../util');
 
 describe('asset', () => {
   const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(join(__dirname, 'asset_test'), {silent: true});
+  const hexo = new Hexo(join(__dirname, 'asset_test'), {silent : true});
   const generator = require('../../../lib/plugins/generator/asset').bind(hexo);
   const Asset = hexo.model('Asset');
 
@@ -27,10 +27,8 @@ describe('asset', () => {
     const source = join(hexo.base_dir, path);
     const content = 'foo: bar';
 
-    await Promise.all([
-      Asset.insert({_id: path, path}),
-      writeFile(source, content)
-    ]);
+    await Promise.all(
+        [ Asset.insert({_id : path, path}), writeFile(source, content) ]);
     const data = await generator(hexo.locals);
     data[0].path.should.eql('test.json');
     data[0].data.modified.should.be.true;
@@ -38,10 +36,7 @@ describe('asset', () => {
     const result = await data[0].data.data();
     result.should.eql('{"foo":"bar"}');
 
-    await Promise.all([
-      Asset.removeById(path),
-      unlink(source)
-    ]);
+    await Promise.all([ Asset.removeById(path), unlink(source) ]);
   });
 
   it('not renderable', async () => {
@@ -49,20 +44,15 @@ describe('asset', () => {
     const source = join(hexo.base_dir, path);
     const content = 'test content';
 
-    await Promise.all([
-      Asset.insert({_id: path, path}),
-      writeFile(source, content)
-    ]);
+    await Promise.all(
+        [ Asset.insert({_id : path, path}), writeFile(source, content) ]);
     const data = await generator(hexo.locals);
     data[0].path.should.eql(path);
     data[0].data.modified.should.be.true;
 
     await checkStream(data[0].data.data(), content);
 
-    await Promise.all([
-      Asset.removeById(path),
-      unlink(source)
-    ]);
+    await Promise.all([ Asset.removeById(path), unlink(source) ]);
   });
 
   it('skip render', async () => {
@@ -71,7 +61,7 @@ describe('asset', () => {
     const content = 'foo: bar';
 
     await Promise.all([
-      Asset.insert({_id: path, path, renderable: false}),
+      Asset.insert({_id : path, path, renderable : false}),
       writeFile(source, content)
     ]);
     const data = await generator(hexo.locals);
@@ -79,19 +69,13 @@ describe('asset', () => {
     data[0].data.modified.should.be.true;
 
     await checkStream(data[0].data.data(), content);
-    await Promise.all([
-      Asset.removeById(path),
-      unlink(source)
-    ]);
+    await Promise.all([ Asset.removeById(path), unlink(source) ]);
   });
 
   it('remove assets which does not exist', async () => {
     const path = 'test.txt';
 
-    await Asset.insert({
-      _id: path,
-      path
-    });
+    await Asset.insert({_id : path, path});
     await generator(hexo.locals);
     should.not.exist(Asset.findById(path));
   });
@@ -100,16 +84,11 @@ describe('asset', () => {
     const path = 'test.min.js';
     const source = join(hexo.base_dir, path);
 
-    await Promise.all([
-      Asset.insert({_id: path, path}),
-      writeFile(source, '')
-    ]);
+    await Promise.all(
+        [ Asset.insert({_id : path, path}), writeFile(source, '') ]);
     const data = await generator(hexo.locals);
     data[0].path.should.eql('test.min.js');
 
-    await Promise.all([
-      Asset.removeById(path),
-      unlink(source)
-    ]);
+    await Promise.all([ Asset.removeById(path), unlink(source) ]);
   });
 });

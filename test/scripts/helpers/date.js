@@ -9,19 +9,12 @@ describe('date', () => {
   const dateHelper = require('../../../lib/plugins/helper/date');
   let clock;
 
-  before(() => {
-    clock = sinon.useFakeTimers(Date.now());
-  });
+  before(() => { clock = sinon.useFakeTimers(Date.now()); });
 
-  after(() => {
-    clock.restore();
-  });
+  after(() => { clock.restore(); });
 
   it('date', () => {
-    const ctx = {
-      config: hexo.config,
-      page: {}
-    };
+    const ctx = {config : hexo.config, page : {}};
 
     const date = dateHelper.date.bind(ctx);
 
@@ -42,12 +35,14 @@ describe('date', () => {
 
     // page.lang
     ctx.page.lang = 'zh-tw';
-    date(Date.now(), 'MMM D YYYY').should.eql(moment().locale('zh-tw').format('MMM D YYYY'));
+    date(Date.now(), 'MMM D YYYY')
+        .should.eql(moment().locale('zh-tw').format('MMM D YYYY'));
     ctx.page.lang = '';
 
     // config.language
     ctx.config.language = 'ja';
-    date(Date.now(), 'MMM D YYYY').should.eql(moment().locale('ja').format('MMM D YYYY'));
+    date(Date.now(), 'MMM D YYYY')
+        .should.eql(moment().locale('ja').format('MMM D YYYY'));
     ctx.config.language = '';
 
     // timezone
@@ -73,10 +68,7 @@ describe('date', () => {
   });
 
   it('relative_date', () => {
-    const ctx = {
-      config: hexo.config,
-      page: {}
-    };
+    const ctx = {config : hexo.config, page : {}};
 
     const relativeDate = dateHelper.relative_date.bind(ctx);
 
@@ -94,10 +86,7 @@ describe('date', () => {
   });
 
   it('time', () => {
-    const ctx = {
-      config: hexo.config,
-      page: {}
-    };
+    const ctx = {config : hexo.config, page : {}};
 
     const time = dateHelper.time.bind(ctx);
 
@@ -118,12 +107,14 @@ describe('date', () => {
 
     // page.lang
     ctx.page.lang = 'zh-tw';
-    time(Date.now(), 'A H:mm').should.eql(moment().locale('zh-tw').format('A H:mm'));
+    time(Date.now(), 'A H:mm')
+        .should.eql(moment().locale('zh-tw').format('A H:mm'));
     ctx.page.lang = '';
 
     // config.language
     ctx.config.language = 'ja';
-    time(Date.now(), 'A H:mm').should.eql(moment().locale('ja').format('A H:mm'));
+    time(Date.now(), 'A H:mm')
+        .should.eql(moment().locale('ja').format('A H:mm'));
     ctx.config.language = '';
 
     // timezone
@@ -134,14 +125,15 @@ describe('date', () => {
 
   it('full_date', () => {
     const ctx = {
-      config: hexo.config,
-      date: dateHelper.date,
-      time: dateHelper.time,
-      page: {}
+      config : hexo.config,
+      date : dateHelper.date,
+      time : dateHelper.time,
+      page : {}
     };
 
     const fullDate = dateHelper.full_date.bind(ctx);
-    const fullDateFormat = hexo.config.date_format + ' ' + hexo.config.time_format;
+    const fullDateFormat =
+        hexo.config.date_format + ' ' + hexo.config.time_format;
 
     // now
     fullDate().should.eql(moment().format(fullDateFormat));
@@ -152,15 +144,18 @@ describe('date', () => {
 
     // date
     fullDate(new Date()).should.eql(moment().format(fullDateFormat));
-    fullDate(new Date(), 'MMM-D-YYYY').should.eql(moment().format('MMM-D-YYYY'));
+    fullDate(new Date(), 'MMM-D-YYYY')
+        .should.eql(moment().format('MMM-D-YYYY'));
 
     // number
     fullDate(Date.now()).should.eql(moment().format(fullDateFormat));
-    fullDate(Date.now(), 'MMM-D-YYYY').should.eql(moment().format('MMM-D-YYYY'));
+    fullDate(Date.now(), 'MMM-D-YYYY')
+        .should.eql(moment().format('MMM-D-YYYY'));
 
     // page.lang
     ctx.page.lang = 'zh-tw';
-    fullDate(Date.now(), 'LLL').should.eql(moment().locale('zh-tw').format('LLL'));
+    fullDate(Date.now(), 'LLL')
+        .should.eql(moment().locale('zh-tw').format('LLL'));
     ctx.page.lang = '';
 
     // config.language
@@ -175,18 +170,15 @@ describe('date', () => {
   });
 
   it('time_tag', () => {
-    const ctx = {
-      config: hexo.config,
-      date: dateHelper.date,
-      page: {}
-    };
+    const ctx = {config : hexo.config, date : dateHelper.date, page : {}};
 
     const timeTag = dateHelper.time_tag.bind(ctx);
 
     function result(date, format) {
       date = date || new Date();
       format = format || hexo.config.date_format;
-      return '<time datetime="' + moment(date).toISOString() + '">' + moment(date).format(format) + '</time>';
+      return '<time datetime="' + moment(date).toISOString() + '">' +
+             moment(date).format(format) + '</time>';
     }
 
     function check(date, format) {
@@ -211,17 +203,23 @@ describe('date', () => {
 
     // page.lang
     ctx.page.lang = 'zh-tw';
-    timeTag(Date.now(), 'LLL').should.eql('<time datetime="' + moment().toISOString() + '">' + moment().locale('zh-tw').format('LLL') + '</time>');
+    timeTag(Date.now(), 'LLL')
+        .should.eql('<time datetime="' + moment().toISOString() + '">' +
+                    moment().locale('zh-tw').format('LLL') + '</time>');
     ctx.page.lang = '';
 
     // config.language
     ctx.config.language = 'ja';
-    timeTag(Date.now(), 'LLL').should.eql('<time datetime="' + moment().toISOString() + '">' + moment().locale('ja').format('LLL') + '</time>');
+    timeTag(Date.now(), 'LLL')
+        .should.eql('<time datetime="' + moment().toISOString() + '">' +
+                    moment().locale('ja').format('LLL') + '</time>');
     ctx.config.language = '';
 
     // timezone
     ctx.config.timezone = 'UTC';
-    timeTag(Date.now(), 'LLL').should.eql('<time datetime="' + moment().toISOString() + '">' + moment().tz('UTC').format('LLL') + '</time>');
+    timeTag(Date.now(), 'LLL')
+        .should.eql('<time datetime="' + moment().toISOString() + '">' +
+                    moment().tz('UTC').format('LLL') + '</time>');
     ctx.config.timezone = '';
   });
 

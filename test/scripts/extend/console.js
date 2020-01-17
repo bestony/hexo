@@ -10,9 +10,8 @@ describe('Console', () => {
     try {
       c.register();
     } catch (err) {
-      err.should.be
-        .instanceOf(TypeError)
-        .property('message', 'name is required');
+      err.should.be.instanceOf(TypeError).property('message',
+                                                   'name is required');
     }
 
     // name, fn
@@ -24,9 +23,8 @@ describe('Console', () => {
     try {
       c.register('test');
     } catch (err) {
-      err.should.be
-        .instanceOf(TypeError)
-        .property('message', 'fn must be a function');
+      err.should.be.instanceOf(TypeError).property('message',
+                                                   'fn must be a function');
     }
 
     // name, desc, fn
@@ -39,19 +37,18 @@ describe('Console', () => {
     try {
       c.register('test', 'this is a test');
     } catch (err) {
-      err.should.be
-        .instanceOf(TypeError)
-        .property('message', 'fn must be a function');
+      err.should.be.instanceOf(TypeError).property('message',
+                                                   'fn must be a function');
     }
 
     // name, options, fn
-    c.register('test', {init: true}, () => {});
+    c.register('test', {init : true}, () => {});
 
     c.get('test').should.exist;
     c.get('test').options.init.should.be.true;
 
     // name, desc, options, fn
-    c.register('test', 'this is a test', {init: true}, () => {});
+    c.register('test', 'this is a test', {init : true}, () => {});
 
     c.get('test').should.exist;
     c.get('test').desc.should.eql('this is a test');
@@ -59,11 +56,10 @@ describe('Console', () => {
 
     // name, desc, options, not fn
     try {
-      c.register('test', 'this is a test', {init: true});
+      c.register('test', 'this is a test', {init : true});
     } catch (err) {
-      err.should.be
-        .instanceOf(TypeError)
-        .property('message', 'fn must be a function');
+      err.should.be.instanceOf(TypeError).property('message',
+                                                   'fn must be a function');
     }
   });
 
@@ -72,27 +68,18 @@ describe('Console', () => {
 
     c.register('test', () => {});
 
-    c.alias.should.eql({
-      t: 'test',
-      te: 'test',
-      tes: 'test',
-      test: 'test'
-    });
+    c.alias.should.eql({t : 'test', te : 'test', tes : 'test', test : 'test'});
   });
 
   it('register() - promisify', () => {
     const c = new Console();
 
     c.register('test', (args, callback) => {
-      args.should.eql({foo: 'bar'});
+      args.should.eql({foo : 'bar'});
       callback(null, 'foo');
     });
 
-    c.get('test')({
-      foo: 'bar'
-    }).then(result => {
-      result.should.eql('foo');
-    });
+    c.get('test')({foo : 'bar'}).then(result => { result.should.eql('foo'); });
   });
 
   it('list()', () => {
@@ -100,7 +87,7 @@ describe('Console', () => {
 
     c.register('test', () => {});
 
-    c.list().should.have.keys(['test']);
+    c.list().should.have.keys([ 'test' ]);
   });
 
   it('get()', () => {

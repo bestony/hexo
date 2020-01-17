@@ -5,14 +5,12 @@ describe('list_archives', () => {
   const hexo = new Hexo(__dirname);
   const Post = hexo.model('Post');
 
-  const ctx = {
-    config: hexo.config,
-    page: {}
-  };
+  const ctx = {config : hexo.config, page : {}};
 
   ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
 
-  const listArchives = require('../../../lib/plugins/helper/list_archives').bind(ctx);
+  const listArchives =
+      require('../../../lib/plugins/helper/list_archives').bind(ctx);
 
   function resetLocals() {
     hexo.locals.invalidate();
@@ -22,10 +20,10 @@ describe('list_archives', () => {
   before(async () => {
     await hexo.init();
     await Post.insert([
-      {source: 'foo', slug: 'foo', date: new Date(2014, 1, 2)},
-      {source: 'bar', slug: 'bar', date: new Date(2013, 5, 6)},
-      {source: 'baz', slug: 'baz', date: new Date(2013, 9, 10)},
-      {source: 'boo', slug: 'boo', date: new Date(2013, 5, 8)}
+      {source : 'foo', slug : 'foo', date : new Date(2014, 1, 2)},
+      {source : 'bar', slug : 'bar', date : new Date(2013, 5, 6)},
+      {source : 'baz', slug : 'baz', date : new Date(2013, 9, 10)},
+      {source : 'boo', slug : 'boo', date : new Date(2013, 5, 8)}
     ]);
     resetLocals();
   });
@@ -43,9 +41,7 @@ describe('list_archives', () => {
   });
 
   it('type: yearly', () => {
-    const result = listArchives({
-      type: 'yearly'
-    });
+    const result = listArchives({type : 'yearly'});
 
     result.should.eql([
       '<ul class="archive-list">',
@@ -56,9 +52,7 @@ describe('list_archives', () => {
   });
 
   it('format', () => {
-    const result = listArchives({
-      format: 'YYYY/M'
-    });
+    const result = listArchives({format : 'YYYY/M'});
 
     result.should.eql([
       '<ul class="archive-list">',
@@ -70,9 +64,7 @@ describe('list_archives', () => {
   });
 
   it('style: false', () => {
-    const result = listArchives({
-      style: false
-    });
+    const result = listArchives({style : false});
 
     result.should.eql([
       '<a class="archive-link" href="/archives/2014/02/">February 2014<span class="archive-count">1</span></a>',
@@ -82,9 +74,7 @@ describe('list_archives', () => {
   });
 
   it('show_count', () => {
-    const result = listArchives({
-      show_count: false
-    });
+    const result = listArchives({show_count : false});
 
     result.should.eql([
       '<ul class="archive-list">',
@@ -96,10 +86,7 @@ describe('list_archives', () => {
   });
 
   it('show_count + style: false', () => {
-    const result = listArchives({
-      style: false,
-      show_count: false
-    });
+    const result = listArchives({style : false, show_count : false});
 
     result.should.eql([
       '<a class="archive-link" href="/archives/2014/02/">February 2014</a>',
@@ -109,9 +96,7 @@ describe('list_archives', () => {
   });
 
   it('order', () => {
-    const result = listArchives({
-      order: 1
-    });
+    const result = listArchives({order : 1});
 
     result.should.eql([
       '<ul class="archive-list">',
@@ -123,11 +108,7 @@ describe('list_archives', () => {
   });
 
   it('transform', () => {
-    const result = listArchives({
-      transform(str) {
-        return str.toUpperCase();
-      }
-    });
+    const result = listArchives({transform(str) { return str.toUpperCase(); }});
 
     result.should.eql([
       '<ul class="archive-list">',
@@ -139,12 +120,8 @@ describe('list_archives', () => {
   });
 
   it('transform + style: false', () => {
-    const result = listArchives({
-      style: false,
-      transform(str) {
-        return str.toUpperCase();
-      }
-    });
+    const result = listArchives(
+        {style : false, transform(str) { return str.toUpperCase(); }});
 
     result.should.eql([
       '<a class="archive-link" href="/archives/2014/02/">FEBRUARY 2014<span class="archive-count">1</span></a>',
@@ -154,10 +131,7 @@ describe('list_archives', () => {
   });
 
   it('separator', () => {
-    const result = listArchives({
-      style: false,
-      separator: ''
-    });
+    const result = listArchives({style : false, separator : ''});
 
     result.should.eql([
       '<a class="archive-link" href="/archives/2014/02/">February 2014<span class="archive-count">1</span></a>',
@@ -167,9 +141,7 @@ describe('list_archives', () => {
   });
 
   it('class', () => {
-    const result = listArchives({
-      class: 'test'
-    });
+    const result = listArchives({class : 'test'});
 
     result.should.eql([
       '<ul class="test-list">',
@@ -210,9 +182,7 @@ describe('list_archives', () => {
 
   it('timezone', () => {
     ctx.config.timezone = 'Asia/Tokyo';
-    const result = listArchives({
-      format: 'YYYY MM ZZ'
-    });
+    const result = listArchives({format : 'YYYY MM ZZ'});
 
     result.should.eql([
       '<ul class="archive-list">',

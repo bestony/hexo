@@ -1,10 +1,11 @@
 'use strict';
 
-const { join, sep } = require('path');
-const { appendFile, mkdir, mkdirs, rename, rmdir, stat, unlink, writeFile } = require('hexo-fs');
+const {join, sep} = require('path');
+const {appendFile, mkdir, mkdirs, rename, rmdir, stat, unlink, writeFile} =
+    require('hexo-fs');
 const Promise = require('bluebird');
-const { hash, Pattern } = require('hexo-util');
-const { spy } = require('sinon');
+const {hash, Pattern} = require('hexo-util');
+const {spy} = require('sinon');
 
 describe('Box', () => {
   const Hexo = require('../../../lib/hexo');
@@ -12,7 +13,7 @@ describe('Box', () => {
   const Box = require('../../../lib/box');
 
   const newBox = (path, config) => {
-    const hexo = new Hexo(baseDir, { silent: true });
+    const hexo = new Hexo(baseDir, {silent : true});
     hexo.config = Object.assign(hexo.config, config);
     const base = path ? join(baseDir, path) : baseDir;
     return new Box(hexo, base);
@@ -81,9 +82,7 @@ describe('Box', () => {
     const box = newBox('test');
     const data = {};
 
-    box.addProcessor(file => {
-      data[file.path] = file;
-    });
+    box.addProcessor(file => { data[file.path] = file; });
 
     await Promise.all([
       writeFile(join(box.base, 'a.txt'), 'a'),
@@ -143,11 +142,8 @@ describe('Box', () => {
 
     await Promise.all([
       writeFile(path, 'a'),
-      box.Cache.insert({
-        _id: cacheId,
-        modified: 0,
-        hash: hash('b').toString('hex')
-      })
+      box.Cache.insert(
+          {_id : cacheId, modified : 0, hash : hash('b').toString('hex')})
     ]);
     await box.process();
 
@@ -169,11 +165,8 @@ describe('Box', () => {
 
     await writeFile(path, 'a');
     await stat(path);
-    await box.Cache.insert({
-      _id: cacheId,
-      modified: 0,
-      hash: hash('a').toString('hex')
-    });
+    await box.Cache.insert(
+        {_id : cacheId, modified : 0, hash : hash('a').toString('hex')});
     await box.process();
 
     const file = processor.args[0][0];
@@ -195,9 +188,9 @@ describe('Box', () => {
     await writeFile(path, 'a');
     const stats = await stat(path);
     await box.Cache.insert({
-      _id: cacheId,
-      modified: stats.mtime,
-      hash: hash('b').toString('hex')
+      _id : cacheId,
+      modified : stats.mtime,
+      hash : hash('b').toString('hex')
     });
     await box.process();
 
@@ -220,9 +213,9 @@ describe('Box', () => {
     await writeFile(path, 'a');
     const stats = await stat(path);
     await box.Cache.insert({
-      _id: cacheId,
-      modified: stats.mtime,
-      hash: hash('a').toString('hex')
+      _id : cacheId,
+      modified : stats.mtime,
+      hash : hash('a').toString('hex')
     });
     await box.process();
 
@@ -237,18 +230,11 @@ describe('Box', () => {
     const box = newBox('test');
     const cacheId = 'test/a.txt';
 
-    const processor = spy(file => {
-      file.type.should.eql('delete');
-    });
+    const processor = spy(file => { file.type.should.eql('delete'); });
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      mkdirs(box.base),
-      box.Cache.insert({
-        _id: cacheId
-      })
-    ]);
+    await Promise.all([ mkdirs(box.base), box.Cache.insert({_id : cacheId}) ]);
     await box.process();
 
     processor.calledOnce.should.eql(true);
@@ -260,9 +246,7 @@ describe('Box', () => {
     const box = newBox('test');
     const path = join(box.base, 'posts', '123456');
 
-    const processor = spy(file => {
-      file.params.id.should.eql('123456');
-    });
+    const processor = spy(file => { file.params.id.should.eql('123456'); });
 
     box.addProcessor('posts/:id', processor);
 
@@ -275,16 +259,12 @@ describe('Box', () => {
   });
 
   it('process() - handle null ignore', async () => {
-    const box = newBox('test', { ignore: null });
+    const box = newBox('test', {ignore : null});
     const data = {};
 
-    box.addProcessor(file => {
-      data[file.path] = file;
-    });
+    box.addProcessor(file => { data[file.path] = file; });
 
-    await Promise.all([
-      writeFile(join(box.base, 'foo.txt'), 'foo')
-    ]);
+    await Promise.all([ writeFile(join(box.base, 'foo.txt'), 'foo') ]);
     await box.process();
 
     const keys = Object.keys(data);
@@ -295,62 +275,61 @@ describe('Box', () => {
     await rmdir(box.base);
   });
 
-  it('process() - skip files if they match a glob epression in ignore', async () => {
-    const box = newBox('test', { ignore: '**/ignore_me' });
-    const data = {};
+  it('process() - skip files if they match a glob epression in ignore',
+     async () => {
+       const box = newBox('test', {ignore : '**/ignore_me'});
+       const data = {};
 
-    box.addProcessor(file => {
-      data[file.path] = file;
-    });
+       box.addProcessor(file => { data[file.path] = file; });
 
-    await Promise.all([
-      writeFile(join(box.base, 'foo.txt'), 'foo'),
-      writeFile(join(box.base, 'ignore_me', 'bar.txt'), 'ignore_me')
-    ]);
-    await box.process();
+       await Promise.all([
+         writeFile(join(box.base, 'foo.txt'), 'foo'),
+         writeFile(join(box.base, 'ignore_me', 'bar.txt'), 'ignore_me')
+       ]);
+       await box.process();
 
-    const keys = Object.keys(data);
+       const keys = Object.keys(data);
 
-    keys.length.should.eql(1);
-    keys[0].should.eql('foo.txt');
+       keys.length.should.eql(1);
+       keys[0].should.eql('foo.txt');
 
-    await rmdir(box.base);
-  });
+       await rmdir(box.base);
+     });
 
-  it('process() - skip files if they match any of the glob expressions in ignore', async () => {
-    const box = newBox('test', { ignore: ['**/ignore_me', '**/ignore_me_too.txt'] });
-    const data = {};
+  it('process() - skip files if they match any of the glob expressions in ignore',
+     async () => {
+       const box = newBox(
+           'test', {ignore : [ '**/ignore_me', '**/ignore_me_too.txt' ]});
+       const data = {};
 
-    box.addProcessor(file => {
-      data[file.path] = file;
-    });
+       box.addProcessor(file => { data[file.path] = file; });
 
-    await Promise.all([
-      writeFile(join(box.base, 'foo.txt'), 'foo'),
-      writeFile(join(box.base, 'ignore_me', 'bar.txt'), 'ignore_me'),
-      writeFile(join(box.base, 'ignore_me_too.txt'), 'ignore_me_too')
-    ]);
-    await box.process();
+       await Promise.all([
+         writeFile(join(box.base, 'foo.txt'), 'foo'),
+         writeFile(join(box.base, 'ignore_me', 'bar.txt'), 'ignore_me'),
+         writeFile(join(box.base, 'ignore_me_too.txt'), 'ignore_me_too')
+       ]);
+       await box.process();
 
-    const keys = Object.keys(data);
+       const keys = Object.keys(data);
 
-    keys.length.should.eql(1);
-    keys[0].should.eql('foo.txt');
+       keys.length.should.eql(1);
+       keys[0].should.eql('foo.txt');
 
-    await rmdir(box.base);
-  });
+       await rmdir(box.base);
+     });
 
   it('process() - skip node_modules of theme by default', async () => {
-    const box = newBox('test', { ignore: null });
+    const box = newBox('test', {ignore : null});
     const data = {};
 
-    box.addProcessor(file => {
-      data[file.path] = file;
-    });
+    box.addProcessor(file => { data[file.path] = file; });
 
     await Promise.all([
       writeFile(join(box.base, 'foo.txt'), 'foo'),
-      writeFile(join(box.base, 'themes', 'bar', 'node_modules', 'bar_library', 'bar.js'), 'themes')
+      writeFile(join(box.base, 'themes', 'bar', 'node_modules', 'bar_library',
+                     'bar.js'),
+                'themes')
     ]);
     await box.process();
 
@@ -363,17 +342,17 @@ describe('Box', () => {
   });
 
   it('process() - always skip node_modules of theme', async () => {
-    const box = newBox('test', { ignore: '**/ignore_me' });
+    const box = newBox('test', {ignore : '**/ignore_me'});
     const data = {};
 
-    box.addProcessor(file => {
-      data[file.path] = file;
-    });
+    box.addProcessor(file => { data[file.path] = file; });
 
     await Promise.all([
       writeFile(join(box.base, 'foo.txt'), 'foo'),
       writeFile(join(box.base, 'ignore_me', 'bar.txt'), 'ignore_me'),
-      writeFile(join(box.base, 'themes', 'bar', 'node_modules', 'bar_library', 'bar.js'), 'themes')
+      writeFile(join(box.base, 'themes', 'bar', 'node_modules', 'bar_library',
+                     'bar.js'),
+                'themes')
     ]);
     await box.process();
 
@@ -393,7 +372,7 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([writeFile(src, 'a')]);
+    await Promise.all([ writeFile(src, 'a') ]);
     await box.watch();
     box.isWatching().should.eql(true);
     await Promise.delay(500);
@@ -419,10 +398,7 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      writeFile(src, 'a'),
-      Cache.insert({_id: cacheId})
-    ]);
+    await Promise.all([ writeFile(src, 'a'), Cache.insert({_id : cacheId}) ]);
     await box.watch();
     await appendFile(src, 'b');
     await Promise.delay(500);
@@ -448,10 +424,7 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      writeFile(src, 'a'),
-      Cache.insert({_id: cacheId})
-    ]);
+    await Promise.all([ writeFile(src, 'a'), Cache.insert({_id : cacheId}) ]);
     await box.watch();
     await unlink(src);
     await Promise.delay(500);
@@ -479,29 +452,27 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      writeFile(src, 'a'),
-      Cache.insert({_id: cacheId})
-    ]);
+    await Promise.all([ writeFile(src, 'a'), Cache.insert({_id : cacheId}) ]);
     await box.watch();
     await rename(src, newSrc);
     await Promise.delay(500);
 
-    const lastTwoCalls = processor.args.slice(processor.args.length - 2, processor.args.length);
+    const lastTwoCalls =
+        processor.args.slice(processor.args.length - 2, processor.args.length);
 
     lastTwoCalls.forEach(args => {
       const file = args[0];
 
       switch (file.type) {
-        case 'create':
-          file.source.should.eql(newSrc);
-          file.path.should.eql(newPath);
-          break;
+      case 'create':
+        file.source.should.eql(newSrc);
+        file.path.should.eql(newPath);
+        break;
 
-        case 'delete':
-          file.source.should.eql(src);
-          file.path.should.eql(path);
-          break;
+      case 'delete':
+        file.source.should.eql(src);
+        file.path.should.eql(path);
+        break;
       }
     });
 
@@ -521,29 +492,27 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      writeFile(src, 'a'),
-      Cache.insert({_id: cacheId})
-    ]);
+    await Promise.all([ writeFile(src, 'a'), Cache.insert({_id : cacheId}) ]);
     await box.watch();
     await rename(join(box.base, 'a'), join(box.base, 'b'));
     await Promise.delay(500);
 
-    const lastTwoCalls = processor.args.slice(processor.args.length - 2, processor.args.length);
+    const lastTwoCalls =
+        processor.args.slice(processor.args.length - 2, processor.args.length);
 
     lastTwoCalls.forEach(args => {
       const file = args[0];
 
       switch (file.type) {
-        case 'create':
-          file.source.should.eql(newSrc);
-          file.path.should.eql(newPath);
-          break;
+      case 'create':
+        file.source.should.eql(newSrc);
+        file.path.should.eql(newPath);
+        break;
 
-        case 'delete':
-          file.source.should.eql(src);
-          file.path.should.eql(path);
-          break;
+      case 'delete':
+        file.source.should.eql(src);
+        file.path.should.eql(path);
+        break;
       }
     });
 
@@ -552,7 +521,7 @@ describe('Box', () => {
   });
 
   it('watch() - update with simple "ignore" option', async () => {
-    const box = newBox('test', {ignore: '**/ignore_me'});
+    const box = newBox('test', {ignore : '**/ignore_me'});
     const path1 = 'a.txt';
     const path2 = 'b.txt';
     const src1 = join(box.base, path1);
@@ -564,14 +533,8 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      writeFile(src1, 'a'),
-      Cache.insert({_id: cacheId1})
-    ]);
-    await Promise.all([
-      writeFile(src2, 'b'),
-      Cache.insert({_id: cacheId2})
-    ]);
+    await Promise.all([ writeFile(src1, 'a'), Cache.insert({_id : cacheId1}) ]);
+    await Promise.all([ writeFile(src2, 'b'), Cache.insert({_id : cacheId2}) ]);
     await box.watch();
     await appendFile(src1, 'aaa');
     await Promise.delay(500);
@@ -594,7 +557,8 @@ describe('Box', () => {
   });
 
   it('watch() - update with complex "ignore" option', async () => {
-    const box = newBox('test', {ignore: ['**/ignore_me', '**/ignore_me_too.txt']});
+    const box =
+        newBox('test', {ignore : [ '**/ignore_me', '**/ignore_me_too.txt' ]});
     const path1 = 'a.txt';
     const path2 = 'b.txt';
     const path3 = 'ignore_me_too.txt';
@@ -609,18 +573,9 @@ describe('Box', () => {
 
     box.addProcessor(processor);
 
-    await Promise.all([
-      writeFile(src1, 'a'),
-      Cache.insert({_id: cacheId1})
-    ]);
-    await Promise.all([
-      writeFile(src2, 'b'),
-      Cache.insert({_id: cacheId2})
-    ]);
-    await Promise.all([
-      writeFile(src3, 'c'),
-      Cache.insert({_id: cacheId3})
-    ]);
+    await Promise.all([ writeFile(src1, 'a'), Cache.insert({_id : cacheId1}) ]);
+    await Promise.all([ writeFile(src2, 'b'), Cache.insert({_id : cacheId2}) ]);
+    await Promise.all([ writeFile(src3, 'c'), Cache.insert({_id : cacheId3}) ]);
     await box.watch();
     await appendFile(src1, 'aaa');
     await Promise.delay(500);
@@ -666,16 +621,14 @@ describe('Box', () => {
     const box = newBox('test');
     const data = [];
 
-    box.addProcessor(file => {
-      data.push(file.path);
-    });
+    box.addProcessor(file => { data.push(file.path); });
 
     await Promise.all([
       writeFile(join(box.base, 'a.txt'), 'a'),
       writeFile(join(box.base, 'b', 'c.js'), 'c')
     ]);
     await box.watch();
-    data.should.have.members(['a.txt', 'b/c.js']);
+    data.should.have.members([ 'a.txt', 'b/c.js' ]);
 
     box.unwatch();
     await rmdir(box.base);

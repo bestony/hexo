@@ -6,9 +6,7 @@ describe('list_tags', () => {
   const Post = hexo.model('Post');
   const Tag = hexo.model('Tag');
 
-  const ctx = {
-    config: hexo.config
-  };
+  const ctx = {config : hexo.config};
 
   ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
 
@@ -17,18 +15,13 @@ describe('list_tags', () => {
   before(async () => {
     await hexo.init();
     const posts = await Post.insert([
-      {source: 'foo', slug: 'foo'},
-      {source: 'bar', slug: 'bar'},
-      {source: 'baz', slug: 'baz'},
-      {source: 'boo', slug: 'boo'}
+      {source : 'foo', slug : 'foo'}, {source : 'bar', slug : 'bar'},
+      {source : 'baz', slug : 'baz'}, {source : 'boo', slug : 'boo'}
     ]);
-    // TODO: Warehouse needs to add a mutex lock when writing data to avoid data sync problem
-    await Promise.all([
-      ['foo'],
-      ['baz'],
-      ['baz'],
-      ['bar']
-    ].map((tags, i) => posts[i].setTags(tags)));
+    // TODO: Warehouse needs to add a mutex lock when writing data to avoid data
+    // sync problem
+    await Promise.all([ [ 'foo' ], [ 'baz' ], [ 'baz' ], [ 'bar' ] ].map(
+        (tags, i) => posts[i].setTags(tags)));
 
     hexo.locals.invalidate();
     ctx.site = hexo.locals.toObject();
@@ -47,9 +40,7 @@ describe('list_tags', () => {
   });
 
   it('specified collection', () => {
-    const result = listTags(Tag.find({
-      name: /^b/
-    }));
+    const result = listTags(Tag.find({name : /^b/}));
 
     result.should.eql([
       '<ul class="tag-list" itemprop="keywords">',
@@ -60,9 +51,7 @@ describe('list_tags', () => {
   });
 
   it('style: false', () => {
-    const result = listTags({
-      style: false
-    });
+    const result = listTags({style : false});
 
     result.should.eql([
       '<a class="tag-link" href="/tags/bar/" rel="tag">bar<span class="tag-count">1</span></a>',
@@ -72,9 +61,7 @@ describe('list_tags', () => {
   });
 
   it('show_count: false', () => {
-    const result = listTags({
-      show_count: false
-    });
+    const result = listTags({show_count : false});
 
     result.should.eql([
       '<ul class="tag-list" itemprop="keywords">',
@@ -86,9 +73,7 @@ describe('list_tags', () => {
   });
 
   it('class', () => {
-    const result = listTags({
-      class: 'test'
-    });
+    const result = listTags({class : 'test'});
 
     result.should.eql([
       '<ul class="test-list" itemprop="keywords">',
@@ -100,9 +85,7 @@ describe('list_tags', () => {
   });
 
   it('orderby', () => {
-    const result = listTags({
-      orderby: 'length'
-    });
+    const result = listTags({orderby : 'length'});
 
     result.should.eql([
       '<ul class="tag-list" itemprop="keywords">',
@@ -114,9 +97,7 @@ describe('list_tags', () => {
   });
 
   it('order', () => {
-    const result = listTags({
-      order: -1
-    });
+    const result = listTags({order : -1});
 
     result.should.eql([
       '<ul class="tag-list" itemprop="keywords">',
@@ -128,11 +109,7 @@ describe('list_tags', () => {
   });
 
   it('transform', () => {
-    const result = listTags({
-      transform(name) {
-        return name.toUpperCase();
-      }
-    });
+    const result = listTags({transform(name) { return name.toUpperCase(); }});
 
     result.should.eql([
       '<ul class="tag-list" itemprop="keywords">',
@@ -144,10 +121,7 @@ describe('list_tags', () => {
   });
 
   it('separator', () => {
-    const result = listTags({
-      style: false,
-      separator: ''
-    });
+    const result = listTags({style : false, separator : ''});
 
     result.should.eql([
       '<a class="tag-link" href="/tags/bar/" rel="tag">bar<span class="tag-count">1</span></a>',
@@ -157,9 +131,7 @@ describe('list_tags', () => {
   });
 
   it('amount', () => {
-    const result = listTags({
-      amount: 2
-    });
+    const result = listTags({amount : 2});
 
     result.should.eql([
       '<ul class="tag-list" itemprop="keywords">',

@@ -1,14 +1,14 @@
 'use strict';
 
-const { exists, mkdirs, readFile, rmdir, unlink } = require('hexo-fs');
+const {exists, mkdirs, readFile, rmdir, unlink} = require('hexo-fs');
 const moment = require('moment');
-const { join } = require('path');
+const {join} = require('path');
 const Promise = require('bluebird');
-const { useFakeTimers } = require('sinon');
+const {useFakeTimers} = require('sinon');
 
 describe('new', () => {
   const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(join(__dirname, 'new_test'), {silent: true});
+  const hexo = new Hexo(join(__dirname, 'new_test'), {silent : true});
   const n = require('../../../lib/plugins/console/new').bind(hexo);
   const post = hexo.post;
   const now = Date.now();
@@ -20,17 +20,12 @@ describe('new', () => {
     await mkdirs(hexo.base_dir);
     await hexo.init();
     await Promise.all([
-      hexo.scaffold.set('post', [
-        'title: {{ title }}',
-        'date: {{ date }}',
-        'tags:',
-        '---'
-      ].join('\n')),
-      hexo.scaffold.set('draft', [
-        'title: {{ title }}',
-        'tags:',
-        '---'
-      ].join('\n'))
+      hexo.scaffold.set(
+          'post',
+          [ 'title: {{ title }}', 'date: {{ date }}', 'tags:', '---' ].join(
+              '\n')),
+      hexo.scaffold.set('draft',
+                        [ 'title: {{ title }}', 'tags:', '---' ].join('\n'))
     ]);
   });
 
@@ -42,16 +37,14 @@ describe('new', () => {
   it('title', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'Hello-World.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await n({
-      _: ['Hello World']
-    });
+    await n({_ : [ 'Hello World' ]});
     const content = await readFile(path);
     content.should.eql(body);
 
@@ -60,15 +53,9 @@ describe('new', () => {
 
   it('layout', async () => {
     const path = join(hexo.source_dir, '_drafts', 'Hello-World.md');
-    const body = [
-      'title: Hello World',
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body = [ 'title: Hello World', 'tags:', '---' ].join('\n') + '\n';
 
-    await n({
-      _: ['draft', 'Hello World']
-    });
+    await n({_ : [ 'draft', 'Hello World' ]});
     const content = await readFile(path);
     content.should.eql(body);
 
@@ -78,17 +65,14 @@ describe('new', () => {
   it('slug', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'foo.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await n({
-      _: ['Hello World'],
-      slug: 'foo'
-    });
+    await n({_ : [ 'Hello World' ], slug : 'foo'});
     const content = await readFile(path);
     content.should.eql(body);
 
@@ -98,17 +82,14 @@ describe('new', () => {
   it('slug - s', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'foo.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await n({
-      _: ['Hello World'],
-      s: 'foo'
-    });
+    await n({_ : [ 'Hello World' ], s : 'foo'});
     const content = await readFile(path);
     content.should.eql(body);
 
@@ -118,18 +99,14 @@ describe('new', () => {
   it('path', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'bar.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await n({
-      _: ['Hello World'],
-      slug: 'foo',
-      path: 'bar'
-    });
+    await n({_ : [ 'Hello World' ], slug : 'foo', path : 'bar'});
     const content = await readFile(path);
     content.should.eql(body);
 
@@ -139,18 +116,14 @@ describe('new', () => {
   it('path - p', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'bar.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await n({
-      _: ['Hello World'],
-      slug: 'foo',
-      p: 'bar'
-    });
+    await n({_ : [ 'Hello World' ], slug : 'foo', p : 'bar'});
     const content = await readFile(path);
     content.should.eql(body);
 
@@ -160,39 +133,30 @@ describe('new', () => {
   it('rename if target existed', async () => {
     const path = join(hexo.source_dir, '_posts', 'Hello-World-1.md');
 
-    await post.create({
-      title: 'Hello World'
-    });
-    await n({
-      _: ['Hello World']
-    });
+    await post.create({title : 'Hello World'});
+    await n({_ : [ 'Hello World' ]});
     const exist = await exists(path);
     exist.should.eql(true);
 
     await Promise.all([
-      unlink(path),
-      unlink(join(hexo.source_dir, '_posts', 'Hello-World.md'))
+      unlink(path), unlink(join(hexo.source_dir, '_posts', 'Hello-World.md'))
     ]);
   });
 
   it('replace existing files', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'Hello-World.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await post.create({
-      title: 'Hello World'
-    });
-    await n({
-      _: ['Hello World'],
-      replace: true
-    });
-    const exist = await exists(join(hexo.source_dir, '_posts', 'Hello-World-1.md'));
+    await post.create({title : 'Hello World'});
+    await n({_ : [ 'Hello World' ], replace : true});
+    const exist =
+        await exists(join(hexo.source_dir, '_posts', 'Hello-World-1.md'));
     exist.should.eql(false);
 
     const content = await readFile(path);
@@ -204,21 +168,17 @@ describe('new', () => {
   it('replace existing files - r', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'Hello-World.md');
-    const body = [
-      'title: Hello World',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
+          'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await post.create({
-      title: 'Hello World'
-    });
-    await n({
-      _: ['Hello World'],
-      r: true
-    });
-    const exist = await exists(join(hexo.source_dir, '_posts', 'Hello-World-1.md'));
+    await post.create({title : 'Hello World'});
+    await n({_ : [ 'Hello World' ], r : true});
+    const exist =
+        await exists(join(hexo.source_dir, '_posts', 'Hello-World-1.md'));
     exist.should.eql(false);
 
     const content = await readFile(path);
@@ -230,18 +190,14 @@ describe('new', () => {
   it('extra data', async () => {
     const date = moment(now);
     const path = join(hexo.source_dir, '_posts', 'Hello-World.md');
-    const body = [
-      'title: Hello World',
-      'foo: bar',
-      'date: ' + date.format('YYYY-MM-DD HH:mm:ss'),
-      'tags:',
-      '---'
-    ].join('\n') + '\n';
+    const body =
+        [
+          'title: Hello World', 'foo: bar',
+          'date: ' + date.format('YYYY-MM-DD HH:mm:ss'), 'tags:', '---'
+        ].join('\n') +
+        '\n';
 
-    await n({
-      _: ['Hello World'],
-      foo: 'bar'
-    });
+    await n({_ : [ 'Hello World' ], foo : 'bar'});
     const content = await readFile(path);
     content.should.eql(body);
 

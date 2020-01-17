@@ -1,13 +1,13 @@
 'use strict';
 
-const { spy } = require('sinon');
-const { join } = require('path');
-const { mkdirs, rmdir, unlink, writeFile} = require('hexo-fs');
+const {spy} = require('sinon');
+const {join} = require('path');
+const {mkdirs, rmdir, unlink, writeFile} = require('hexo-fs');
 const Promise = require('bluebird');
 
 describe('config', () => {
   const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(join(__dirname, 'config_test'), {silent: true});
+  const hexo = new Hexo(join(__dirname, 'config_test'), {silent : true});
   const processor = require('../../../lib/theme/processors/config');
   const process = Promise.method(processor.process.bind(hexo));
   const themeDir = join(hexo.base_dir, 'themes', 'test');
@@ -18,10 +18,8 @@ describe('config', () => {
   }
 
   before(async () => {
-    await Promise.all([
-      mkdirs(themeDir),
-      writeFile(hexo.config_path, 'theme: test')
-    ]);
+    await Promise.all(
+        [ mkdirs(themeDir), writeFile(hexo.config_path, 'theme: test') ]);
     hexo.init();
   });
 
@@ -39,51 +37,37 @@ describe('config', () => {
   });
 
   it('type: create', async () => {
-    const body = [
-      'name:',
-      '  first: John',
-      '  last: Doe'
-    ].join('\n');
+    const body = [ 'name:', '  first: John', '  last: Doe' ].join('\n');
 
-    const file = newFile({
-      path: '_config.yml',
-      type: 'create',
-      content: body
-    });
+    const file =
+        newFile({path : '_config.yml', type : 'create', content : body});
 
     await writeFile(file.source, body);
     await process(file);
-    hexo.theme.config.should.eql({
-      name: {first: 'John', last: 'Doe'}
-    });
+    hexo.theme.config.should.eql({name : {first : 'John', last : 'Doe'}});
 
     unlink(file.source);
   });
 
   it('type: delete', async () => {
-    const file = newFile({
-      path: '_config.yml',
-      type: 'delete'
-    });
+    const file = newFile({path : '_config.yml', type : 'delete'});
 
-    hexo.theme.config = {foo: 'bar'};
+    hexo.theme.config = {foo : 'bar'};
 
     await process(file);
     hexo.theme.config.should.eql({});
   });
 
   it('load failed', () => {
-    const file = newFile({
-      path: '_config.yml',
-      type: 'create'
-    });
+    const file = newFile({path : '_config.yml', type : 'create'});
 
     const errorCallback = spy(err => {
       err.should.have.property('message', 'Theme config load failed.');
     });
 
-    return process(file).catch(errorCallback).finally(() => {
-      errorCallback.calledOnce.should.be.true;
-    }).catch(() => {}); // Catch again because it throws error
+    return process(file)
+        .catch(errorCallback)
+        .finally(() => { errorCallback.calledOnce.should.be.true; })
+        .catch(() => {}); // Catch again because it throws error
   });
 });

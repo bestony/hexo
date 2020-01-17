@@ -3,21 +3,19 @@
 describe('External link', () => {
   const Hexo = require('../../../lib/hexo');
   const hexo = new Hexo();
-  const externalLink = require('../../../lib/plugins/filter/after_render/external_link').bind(hexo);
+  const externalLink =
+      require('../../../lib/plugins/filter/after_render/external_link')
+          .bind(hexo);
 
   hexo.config = {
-    url: 'https://example.com',
-    external_link: {
-      enable: true,
-      field: 'site',
-      exclude: ''
-    }
+    url : 'https://example.com',
+    external_link : {enable : true, field : 'site', exclude : ''}
   };
 
   it('disabled', () => {
-    const content = 'foo'
-      + '<a href="https://hexo.io/">Hexo</a>'
-      + 'bar';
+    const content = 'foo' +
+                    '<a href="https://hexo.io/">Hexo</a>' +
+                    'bar';
 
     hexo.config.external_link.enable = false;
 
@@ -27,9 +25,9 @@ describe('External link', () => {
   });
 
   it('field is post', () => {
-    const content = 'foo'
-      + '<a href="https://hexo.io/">Hexo</a>'
-      + 'bar';
+    const content = 'foo' +
+                    '<a href="https://hexo.io/">Hexo</a>' +
+                    'bar';
 
     hexo.config.external_link.field = 'post';
 
@@ -91,20 +89,16 @@ describe('External link', () => {
   });
 
   it('old option - false', () => {
-    const content = 'foo'
-      + '<a href="https://hexo.io/">Hexo</a>'
-      + 'bar';
+    const content = 'foo' +
+                    '<a href="https://hexo.io/">Hexo</a>' +
+                    'bar';
 
     hexo.config.external_link = false;
 
     const result = typeof externalLink(content);
     result.should.eql('undefined');
 
-    hexo.config.external_link = {
-      enable: true,
-      field: 'site',
-      exclude: ''
-    };
+    hexo.config.external_link = {enable : true, field : 'site', exclude : ''};
   });
 
   it('old option - true', () => {
@@ -113,13 +107,10 @@ describe('External link', () => {
     hexo.config.external_link = true;
 
     const result = externalLink(content);
-    result.should.eql('<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>');
+    result.should.eql(
+        '<a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>');
 
-    hexo.config.external_link = {
-      enable: true,
-      field: 'site',
-      exclude: ''
-    };
+    hexo.config.external_link = {enable : true, field : 'site', exclude : ''};
   });
 
   it('exclude - string', () => {
@@ -149,7 +140,7 @@ describe('External link', () => {
       '<a href="https://baz.com/">Hexo</a>'
     ].join('\n');
 
-    hexo.config.external_link.exclude = ['foo.com', 'bar.com'];
+    hexo.config.external_link.exclude = [ 'foo.com', 'bar.com' ];
 
     const result = externalLink(content);
 
@@ -166,15 +157,13 @@ describe('External link', () => {
 describe('External link - post', () => {
   const Hexo = require('../../../lib/hexo');
   const hexo = new Hexo();
-  const externalLink = require('../../../lib/plugins/filter/after_post_render/external_link').bind(hexo);
+  const externalLink =
+      require('../../../lib/plugins/filter/after_post_render/external_link')
+          .bind(hexo);
 
   hexo.config = {
-    url: 'https://example.com',
-    external_link: {
-      enable: true,
-      field: 'post',
-      exclude: ''
-    }
+    url : 'https://example.com',
+    external_link : {enable : true, field : 'post', exclude : ''}
   };
 
   it('disabled', () => {
@@ -189,9 +178,9 @@ describe('External link - post', () => {
   });
 
   it('field is site', () => {
-    const content = 'foo'
-      + '<a href="https://hexo.io/">Hexo</a>'
-      + 'bar';
+    const content = 'foo' +
+                    '<a href="https://hexo.io/">Hexo</a>' +
+                    'bar';
 
     const data = {content};
     hexo.config.external_link.field = 'site';
@@ -262,11 +251,10 @@ describe('External link - post', () => {
     ].join('\n'));
   });
 
-
   it('backward compatibility', () => {
-    const content = 'foo'
-      + '<a href="https://hexo.io/">Hexo</a>'
-      + 'bar';
+    const content = 'foo' +
+                    '<a href="https://hexo.io/">Hexo</a>' +
+                    'bar';
 
     const data = {content};
     hexo.config.external_link = false;
@@ -274,11 +262,7 @@ describe('External link - post', () => {
     externalLink(data);
     data.content.should.eql(content);
 
-    hexo.config.external_link = {
-      enable: true,
-      field: 'post',
-      exclude: ''
-    };
+    hexo.config.external_link = {enable : true, field : 'post', exclude : ''};
   });
 
   it('exclude - string', () => {
@@ -309,7 +293,7 @@ describe('External link - post', () => {
       '<a href="https://baz.com/">Hexo</a>'
     ].join('\n');
 
-    hexo.config.external_link.exclude = ['foo.com', 'bar.com'];
+    hexo.config.external_link.exclude = [ 'foo.com', 'bar.com' ];
 
     const data = {content};
     externalLink(data);

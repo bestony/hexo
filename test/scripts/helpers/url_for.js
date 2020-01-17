@@ -2,8 +2,8 @@
 
 describe('url_for', () => {
   const ctx = {
-    config: { url: 'https://example.com' },
-    relative_url: require('../../../lib/plugins/helper/relative_url')
+    config : {url : 'https://example.com'},
+    relative_url : require('../../../lib/plugins/helper/relative_url')
   };
 
   const urlFor = require('../../../lib/plugins/helper/url_for').bind(ctx);
@@ -43,15 +43,15 @@ describe('url_for', () => {
 
   it('internal url (options.relative)', () => {
     ctx.path = '';
-    urlFor('index.html', {relative: true}).should.eql('index.html');
+    urlFor('index.html', {relative : true}).should.eql('index.html');
 
     ctx.config.relative_link = true;
-    urlFor('index.html', {relative: false}).should.eql('/index.html');
+    urlFor('index.html', {relative : false}).should.eql('/index.html');
     ctx.config.relative_link = false;
   });
 
   it('internel url (pretty_urls.trailing_index disabled)', () => {
-    ctx.config.pretty_urls = { trailing_index: false };
+    ctx.config.pretty_urls = {trailing_index : false};
     ctx.path = '';
     ctx.config.root = '/';
     urlFor('index.html').should.eql('/');
@@ -63,17 +63,11 @@ describe('url_for', () => {
   });
 
   it('external url', () => {
-    [
-      'https://hexo.io/',
-      '//google.com/',
-      // 'index.html' in external link should not be removed
-      '//google.com/index.html'
-    ].forEach(url => {
-      urlFor(url).should.eql(url);
-    });
+    ['https://hexo.io/', '//google.com/',
+     // 'index.html' in external link should not be removed
+     '//google.com/index.html']
+        .forEach(url => { urlFor(url).should.eql(url); });
   });
 
-  it('only hash', () => {
-    urlFor('#test').should.eql('#test');
-  });
+  it('only hash', () => { urlFor('#test').should.eql('#test'); });
 });

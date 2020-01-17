@@ -50,9 +50,8 @@ describe('Locals', () => {
   });
 
   it('set() - value is required', () => {
-    const errorCallback = sinon.spy(err => {
-      err.should.have.property('message', 'value is required!');
-    });
+    const errorCallback = sinon.spy(
+        err => { err.should.have.property('message', 'value is required!'); });
 
     try {
       locals.set('test');
@@ -92,7 +91,7 @@ describe('Locals', () => {
     locals.set('foo', 'foo');
     locals.set('bar', 'bar');
     locals.remove('bar');
-    locals.toObject().should.eql({foo: 'foo'});
+    locals.toObject().should.eql({foo : 'foo'});
   });
 
   it('invalidate()', () => {

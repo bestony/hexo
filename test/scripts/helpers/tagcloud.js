@@ -8,9 +8,7 @@ describe('tagcloud', () => {
   const Post = hexo.model('Post');
   const Tag = hexo.model('Tag');
 
-  const ctx = {
-    config: hexo.config
-  };
+  const ctx = {config : hexo.config};
 
   ctx.url_for = require('../../../lib/plugins/helper/url_for').bind(ctx);
 
@@ -19,17 +17,14 @@ describe('tagcloud', () => {
   before(async () => {
     await hexo.init();
     const posts = await Post.insert([
-      {source: 'foo', slug: 'foo'},
-      {source: 'bar', slug: 'bar'},
-      {source: 'baz', slug: 'baz'},
-      {source: 'boo', slug: 'boo'}
+      {source : 'foo', slug : 'foo'}, {source : 'bar', slug : 'bar'},
+      {source : 'baz', slug : 'baz'}, {source : 'boo', slug : 'boo'}
     ]);
-    // TODO: Warehouse needs to add a mutex lock when writing data to avoid data sync problem
+    // TODO: Warehouse needs to add a mutex lock when writing data to avoid data
+    // sync problem
     await Promise.all([
-      ['bcd'],
-      ['bcd', 'cde'],
-      ['bcd', 'cde', 'abc'],
-      ['bcd', 'cde', 'abc', 'def']
+      [ 'bcd' ], [ 'bcd', 'cde' ], [ 'bcd', 'cde', 'abc' ],
+      [ 'bcd', 'cde', 'abc', 'def' ]
     ].map((tags, i) => posts[i].setTags(tags)));
 
     hexo.locals.invalidate();
@@ -48,9 +43,7 @@ describe('tagcloud', () => {
   });
 
   it('specified collection', () => {
-    const result = tagcloud(Tag.find({
-      name: /bc/
-    }));
+    const result = tagcloud(Tag.find({name : /bc/}));
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 10px;">abc</a>',
@@ -59,10 +52,7 @@ describe('tagcloud', () => {
   });
 
   it('font size', () => {
-    const result = tagcloud({
-      min_font: 15,
-      max_font: 30
-    });
+    const result = tagcloud({min_font : 15, max_font : 30});
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 20px;">abc</a>',
@@ -72,23 +62,18 @@ describe('tagcloud', () => {
     ].join(' '));
   });
 
-  it('font size - when every tag has the same number of posts, font-size should be minimum.', () => {
-    const result = tagcloud(Tag.find({
-      name: /abc/
-    }), {
-      min_font: 15,
-      max_font: 30
-    });
+  it('font size - when every tag has the same number of posts, font-size should be minimum.',
+     () => {
+       const result =
+           tagcloud(Tag.find({name : /abc/}), {min_font : 15, max_font : 30});
 
-    result.should.eql([
-      '<a href="/tags/abc/" style="font-size: 15px;">abc</a>'
-    ].join(' '));
-  });
+       result.should.eql([
+         '<a href="/tags/abc/" style="font-size: 15px;">abc</a>'
+       ].join(' '));
+     });
 
   it('font unit', () => {
-    const result = tagcloud({
-      unit: 'em'
-    });
+    const result = tagcloud({unit : 'em'});
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 13.33em;">abc</a>',
@@ -99,9 +84,7 @@ describe('tagcloud', () => {
   });
 
   it('orderby - length', () => {
-    const result = tagcloud({
-      orderby: 'length'
-    });
+    const result = tagcloud({orderby : 'length'});
 
     result.should.eql([
       '<a href="/tags/def/" style="font-size: 10px;">def</a>',
@@ -112,28 +95,30 @@ describe('tagcloud', () => {
   });
 
   it('orderby - random', () => {
-    const result1 = tagcloud({
-      orderby: 'random'
-    });
+    const result1 = tagcloud({orderby : 'random'});
 
-    const result2 = tagcloud({
-      orderby: 'rand'
-    });
+    const result2 = tagcloud({orderby : 'rand'});
 
-    result1.should.contains('<a href="/tags/def/" style="font-size: 10px;">def</a>');
-    result1.should.contains('<a href="/tags/abc/" style="font-size: 13.33px;">abc</a>');
-    result1.should.contains('<a href="/tags/cde/" style="font-size: 16.67px;">cde</a>');
-    result1.should.contains('<a href="/tags/bcd/" style="font-size: 20px;">bcd</a>');
-    result2.should.contains('<a href="/tags/def/" style="font-size: 10px;">def</a>');
-    result2.should.contains('<a href="/tags/abc/" style="font-size: 13.33px;">abc</a>');
-    result2.should.contains('<a href="/tags/cde/" style="font-size: 16.67px;">cde</a>');
-    result2.should.contains('<a href="/tags/bcd/" style="font-size: 20px;">bcd</a>');
+    result1.should.contains(
+        '<a href="/tags/def/" style="font-size: 10px;">def</a>');
+    result1.should.contains(
+        '<a href="/tags/abc/" style="font-size: 13.33px;">abc</a>');
+    result1.should.contains(
+        '<a href="/tags/cde/" style="font-size: 16.67px;">cde</a>');
+    result1.should.contains(
+        '<a href="/tags/bcd/" style="font-size: 20px;">bcd</a>');
+    result2.should.contains(
+        '<a href="/tags/def/" style="font-size: 10px;">def</a>');
+    result2.should.contains(
+        '<a href="/tags/abc/" style="font-size: 13.33px;">abc</a>');
+    result2.should.contains(
+        '<a href="/tags/cde/" style="font-size: 16.67px;">cde</a>');
+    result2.should.contains(
+        '<a href="/tags/bcd/" style="font-size: 20px;">bcd</a>');
   });
 
   it('order', () => {
-    const result = tagcloud({
-      order: -1
-    });
+    const result = tagcloud({order : -1});
 
     result.should.eql([
       '<a href="/tags/def/" style="font-size: 10px;">def</a>',
@@ -144,9 +129,7 @@ describe('tagcloud', () => {
   });
 
   it('amount', () => {
-    const result = tagcloud({
-      amount: 2
-    });
+    const result = tagcloud({amount : 2});
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 10px;">abc</a>',
@@ -155,11 +138,7 @@ describe('tagcloud', () => {
   });
 
   it('transform', () => {
-    const result = tagcloud({
-      transform(name) {
-        return name.toUpperCase();
-      }
-    });
+    const result = tagcloud({transform(name) { return name.toUpperCase(); }});
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 13.33px;">ABC</a>',
@@ -170,11 +149,8 @@ describe('tagcloud', () => {
   });
 
   it('color: name', () => {
-    const result = tagcloud({
-      color: true,
-      start_color: 'red',
-      end_color: 'pink'
-    });
+    const result =
+        tagcloud({color : true, start_color : 'red', end_color : 'pink'});
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 13.33px; color: #ff4044">abc</a>',
@@ -186,9 +162,9 @@ describe('tagcloud', () => {
 
   it('color: hex', () => {
     const result = tagcloud({
-      color: true,
-      start_color: '#f00', // red
-      end_color: '#ffc0cb' // pink
+      color : true,
+      start_color : '#f00', // red
+      end_color : '#ffc0cb' // pink
     });
 
     result.should.eql([
@@ -201,9 +177,9 @@ describe('tagcloud', () => {
 
   it('color: RGBA', () => {
     const result = tagcloud({
-      color: true,
-      start_color: 'rgba(70, 130, 180, 0.3)', // steelblue
-      end_color: 'rgb(70, 130, 180)'
+      color : true,
+      start_color : 'rgba(70, 130, 180, 0.3)', // steelblue
+      end_color : 'rgb(70, 130, 180)'
     });
 
     result.should.eql([
@@ -216,9 +192,9 @@ describe('tagcloud', () => {
 
   it('color: HSLA', () => {
     const result = tagcloud({
-      color: true,
-      start_color: 'hsla(207, 44%, 49%, 0.3)', // rgba(70, 130, 180, 0.3)
-      end_color: 'hsl(207, 44%, 49%)' // rgb(70, 130, 180)
+      color : true,
+      start_color : 'hsla(207, 44%, 49%, 0.3)', // rgba(70, 130, 180, 0.3)
+      end_color : 'hsl(207, 44%, 49%)'          // rgb(70, 130, 180)
     });
 
     result.should.eql([
@@ -229,24 +205,19 @@ describe('tagcloud', () => {
     ].join(' '));
   });
 
-  it('color - when every tag has the same number of posts, start_color should be used.', () => {
-    const result = tagcloud(Tag.find({
-      name: /abc/
-    }), {
-      color: true,
-      start_color: 'red',
-      end_color: 'pink'
-    });
+  it('color - when every tag has the same number of posts, start_color should be used.',
+     () => {
+       const result =
+           tagcloud(Tag.find({name : /abc/}),
+                    {color : true, start_color : 'red', end_color : 'pink'});
 
-    result.should.eql([
-      '<a href="/tags/abc/" style="font-size: 10px; color: #f00">abc</a>'
-    ].join(' '));
-  });
+       result.should.eql([
+         '<a href="/tags/abc/" style="font-size: 10px; color: #f00">abc</a>'
+       ].join(' '));
+     });
 
   it('separator', () => {
-    const result = tagcloud({
-      separator: ', '
-    });
+    const result = tagcloud({separator : ', '});
 
     result.should.eql([
       '<a href="/tags/abc/" style="font-size: 13.33px;">abc</a>',

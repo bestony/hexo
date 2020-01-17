@@ -13,11 +13,7 @@ describe('Tag Errors', () => {
   it('unknown tag', async () => {
     const tag = new Tag();
 
-    const body = [
-      '{% abc %}',
-      '  content',
-      '{% endabc %}'
-    ].join('\n');
+    const body = [ '{% abc %}', '  content', '{% endabc %}' ].join('\n');
 
     try {
       await tag.render(body);
@@ -29,14 +25,9 @@ describe('Tag Errors', () => {
   it('no closing tag 1', async () => {
     const tag = new Tag();
 
-    tag.register('test',
-      (args, content) => {},
-      { ends: true });
+    tag.register('test', (args, content) => {}, {ends : true});
 
-    const body = [
-      '{% test %}',
-      '  content'
-    ].join('\n');
+    const body = [ '{% test %}', '  content' ].join('\n');
 
     try {
       await tag.render(body);
@@ -50,15 +41,9 @@ describe('Tag Errors', () => {
   it('no closing tag 2', async () => {
     const tag = new Tag();
 
-    tag.register('test',
-      (args, content) => {},
-      { ends: true });
+    tag.register('test', (args, content) => {}, {ends : true});
 
-    const body = [
-      '{% test %}',
-      '  content',
-      '{% test %}'
-    ].join('\n');
+    const body = [ '{% test %}', '  content', '{% test %}' ].join('\n');
 
     try {
       await tag.render(body);
@@ -86,9 +71,7 @@ describe('Tag Errors', () => {
   it('nested curly braces', async () => {
     const tag = new Tag();
 
-    tag.register('test',
-      (args, content) => {},
-      { ends: true });
+    tag.register('test', (args, content) => {}, {ends : true});
 
     const body = [
       '{% test %}',

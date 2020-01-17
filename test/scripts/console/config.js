@@ -1,14 +1,14 @@
 'use strict';
 
-const { mkdirs, readFile, rmdir, unlink, writeFile } = require('hexo-fs');
-const { join } = require('path');
-const { load } = require('js-yaml');
+const {mkdirs, readFile, rmdir, unlink, writeFile} = require('hexo-fs');
+const {join} = require('path');
+const {load} = require('js-yaml');
 const rewire = require('rewire');
 const sinon = require('sinon');
 
 describe('config', () => {
   const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(join(__dirname, 'config_test'), {silent: true});
+  const hexo = new Hexo(join(__dirname, 'config_test'), {silent : true});
   const config = require('../../../lib/plugins/console/config').bind(hexo);
   const configModule = rewire('../../../lib/plugins/console/config');
 
@@ -24,11 +24,8 @@ describe('config', () => {
   it('read all config', async () => {
     const spy = sinon.spy();
 
-    await configModule.__with__({
-      console: {
-        log: spy
-      }
-    })(() => configModule.call(hexo, {_: []}));
+    await configModule.__with__({console : {log : spy}})(
+        () => configModule.call(hexo, {_ : []}));
 
     spy.args[0][0].should.eql(hexo.config);
   });
@@ -36,11 +33,8 @@ describe('config', () => {
   it('read config', async () => {
     const spy = sinon.spy();
 
-    await configModule.__with__({
-      console: {
-        log: spy
-      }
-    })(() => configModule.call(hexo, {_: ['title']}));
+    await configModule.__with__({console : {log : spy}})(
+        () => configModule.call(hexo, {_ : [ 'title' ]}));
 
     spy.args[0][0].should.eql(hexo.config.title);
   });
@@ -48,25 +42,19 @@ describe('config', () => {
   it('read nested config', () => {
     const spy = sinon.spy();
 
-    hexo.config.server = {
-      port: 12345
-    };
+    hexo.config.server = {port : 12345};
 
-    return configModule.__with__({
-      console: {
-        log: spy
-      }
-    })(() => configModule.call(hexo, {_: ['server.port']})).then(() => {
-      spy.args[0][0].should.eql(hexo.config.server.port);
-    }).finally(() => {
-      delete hexo.config.server;
-    });
+    return configModule
+        .__with__({console : {log : spy}})(
+            () => configModule.call(hexo, {_ : [ 'server.port' ]}))
+        .then(() => { spy.args[0][0].should.eql(hexo.config.server.port); })
+        .finally(() => { delete hexo.config.server; });
   });
 
   async function writeConfig() {
     const args = Array.from(arguments);
 
-    await config({_: args});
+    await config({_ : args});
     const content = await readFile(hexo.config_path);
     return load(content);
   }
@@ -111,7 +99,7 @@ describe('config', () => {
     hexo.config_path = join(hexo.base_dir, '_config.json');
 
     await writeFile(configPath, '{}');
-    await config({_: ['title', 'My Blog']});
+    await config({_ : [ 'title', 'My Blog' ]});
 
     return readFile(configPath).then(content => {
       const json = JSON.parse(content);

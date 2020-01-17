@@ -7,31 +7,32 @@ const Promise = require('bluebird');
 
 describe('partial', () => {
   const Hexo = require('../../../lib/hexo');
-  const hexo = new Hexo(pathFn.join(__dirname, 'partial_test'), {silent: true});
+  const hexo =
+      new Hexo(pathFn.join(__dirname, 'partial_test'), {silent : true});
   const themeDir = pathFn.join(hexo.base_dir, 'themes', 'test');
   const viewDir = pathFn.join(themeDir, 'layout') + pathFn.sep;
   const viewName = 'article.swig';
 
   const ctx = {
-    site: hexo.locals,
-    config: hexo.config,
-    view_dir: viewDir,
-    filename: pathFn.join(viewDir, 'post', viewName),
-    foo: 'foo',
-    cache: true
+    site : hexo.locals,
+    config : hexo.config,
+    view_dir : viewDir,
+    filename : pathFn.join(viewDir, 'post', viewName),
+    foo : 'foo',
+    cache : true
   };
 
-  ctx.fragment_cache = require('../../../lib/plugins/helper/fragment_cache')(hexo);
+  ctx.fragment_cache =
+      require('../../../lib/plugins/helper/fragment_cache')(hexo);
 
   hexo.env.init = true;
 
-  const partial = require('../../../lib/plugins/helper/partial')(hexo).bind(ctx);
+  const partial =
+      require('../../../lib/plugins/helper/partial')(hexo).bind(ctx);
 
   before(async () => {
-    await Promise.all([
-      fs.mkdirs(themeDir),
-      fs.writeFile(hexo.config_path, 'theme: test')
-    ]);
+    await Promise.all(
+        [ fs.mkdirs(themeDir), fs.writeFile(hexo.config_path, 'theme: test') ]);
     await hexo.init();
     hexo.theme.setView('widget/tag.swig', 'tag widget');
   });
@@ -50,29 +51,28 @@ describe('partial', () => {
       partial('foo');
     } catch (err) {
       err.should.have.property(
-        'message',
-        `Partial foo does not exist. (in ${pathFn.join('post', viewName)})`
-      );
+          'message',
+          `Partial foo does not exist. (in ${pathFn.join('post', viewName)})`);
     }
   });
 
   it('locals', () => {
     hexo.theme.setView('test.swig', '{{ foo }}');
 
-    partial('test', {foo: 'bar'}).should.eql('bar');
+    partial('test', {foo : 'bar'}).should.eql('bar');
   });
 
   it('cache', () => {
     hexo.theme.setView('test.swig', '{{ foo }}');
 
-    partial('test', {foo: 'bar'}, {cache: true}).should.eql('bar');
-    partial('test', {}, {cache: true}).should.eql('bar');
+    partial('test', {foo : 'bar'}, {cache : true}).should.eql('bar');
+    partial('test', {}, {cache : true}).should.eql('bar');
   });
 
   it('only', () => {
     hexo.theme.setView('test.swig', '{{ foo }}{{ bar }}');
 
-    partial('test', {bar: 'bar'}, {only: true}).should.eql('bar');
+    partial('test', {bar : 'bar'}, {only : true}).should.eql('bar');
   });
 
   it('a partial in another partial', () => {

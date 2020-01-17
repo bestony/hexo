@@ -1,7 +1,7 @@
 'use strict';
 
-const { join } = require('path');
-const { deepMerge, full_url_for } = require('hexo-util');
+const {join} = require('path');
+const {deepMerge, full_url_for} = require('hexo-util');
 
 describe('Page', () => {
   const Hexo = require('../../../lib/hexo');
@@ -14,10 +14,7 @@ describe('Page', () => {
   it('default values', async () => {
     const now = Date.now();
 
-    const data = await Page.insert({
-      source: 'foo',
-      path: 'bar'
-    });
+    const data = await Page.insert({source : 'foo', path : 'bar'});
 
     data.title.should.eql('');
     data.date.valueOf().should.gte(now);
@@ -43,19 +40,14 @@ describe('Page', () => {
 
   it('path - required', async () => {
     try {
-      await Page.insert({
-        source: 'foo'
-      });
+      await Page.insert({source : 'foo'});
     } catch (err) {
       err.message.should.eql('`path` is required!');
     }
   });
 
   it('permalink - virtual', async () => {
-    const data = await Page.insert({
-      source: 'foo',
-      path: 'bar'
-    });
+    const data = await Page.insert({source : 'foo', path : 'bar'});
     data.permalink.should.eql(hexo.config.url + '/' + data.path);
 
     Page.removeById(data._id);
@@ -63,22 +55,19 @@ describe('Page', () => {
 
   it('permalink - trailing_index', async () => {
     hexo.config.pretty_urls.trailing_index = false;
-    const data = await Page.insert({
-      source: 'foo.md',
-      path: 'bar/index.html'
-    });
-    data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/index\.html$/, ''));
+    const data =
+        await Page.insert({source : 'foo.md', path : 'bar/index.html'});
+    data.permalink.should.eql(hexo.config.url + '/' +
+                              data.path.replace(/index\.html$/, ''));
 
     Page.removeById(data._id);
   });
 
   it('permalink - trailing_html', async () => {
     hexo.config.pretty_urls.trailing_html = false;
-    const data = await Page.insert({
-      source: 'foo.md',
-      path: 'bar/foo.html'
-    });
-    data.permalink.should.eql(hexo.config.url + '/' + data.path.replace(/\.html$/, ''));
+    const data = await Page.insert({source : 'foo.md', path : 'bar/foo.html'});
+    data.permalink.should.eql(hexo.config.url + '/' +
+                              data.path.replace(/\.html$/, ''));
 
     Page.removeById(data._id);
   });
@@ -86,10 +75,8 @@ describe('Page', () => {
   it('permalink - trailing_html - index.html', async () => {
     hexo.config.pretty_urls.trailing_html = false;
 
-    const data = await Page.insert({
-      source: 'foo.md',
-      path: 'bar/foo/index.html'
-    });
+    const data =
+        await Page.insert({source : 'foo.md', path : 'bar/foo/index.html'});
     data.permalink.should.eql(hexo.config.url + '/' + data.path);
 
     Page.removeById(data._id);
@@ -98,20 +85,14 @@ describe('Page', () => {
   it('permalink - should be encoded', async () => {
     hexo.config.url = 'http://fôo.com';
     const path = 'bár';
-    const data = await Page.insert({
-      source: 'foo',
-      path
-    });
+    const data = await Page.insert({source : 'foo', path});
     data.permalink.should.eql(full_url_for.call(hexo, data.path));
 
     Page.removeById(data._id);
   });
 
   it('full_source - virtual', async () => {
-    const data = await Page.insert({
-      source: 'foo',
-      path: 'bar'
-    });
+    const data = await Page.insert({source : 'foo', path : 'bar'});
     data.full_source.should.eql(join(hexo.source_dir, data.source));
 
     Page.removeById(data._id);

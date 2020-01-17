@@ -5,7 +5,8 @@ const moment = require('moment');
 describe('post_permalink', () => {
   const Hexo = require('../../../lib/hexo');
   const hexo = new Hexo();
-  const postPermalink = require('../../../lib/plugins/filter/post_permalink').bind(hexo);
+  const postPermalink =
+      require('../../../lib/plugins/filter/post_permalink').bind(hexo);
   const Post = hexo.model('Post');
   let post;
 
@@ -14,19 +15,14 @@ describe('post_permalink', () => {
     hexo.config.permalink_defaults = {};
 
     await hexo.init();
-    const apost = await Post.insert({
-      source: 'foo.md',
-      slug: 'foo',
-      date: moment('2014-01-02')
-    });
+    const apost = await Post.insert(
+        {source : 'foo.md', slug : 'foo', date : moment('2014-01-02')});
     const id = apost._id;
-    await apost.setCategories(['foo', 'bar']);
+    await apost.setCategories([ 'foo', 'bar' ]);
     post = Post.findById(id);
   });
 
-  it('default', () => {
-    postPermalink(post).should.eql('2014/01/02/foo/');
-  });
+  it('default', () => { postPermalink(post).should.eql('2014/01/02/foo/'); });
 
   it('categories', () => {
     hexo.config.permalink = ':category/:title/';
@@ -36,10 +32,7 @@ describe('post_permalink', () => {
   it('uncategorized', async () => {
     hexo.config.permalink = ':category/:title/';
 
-    const post = await Post.insert({
-      source: 'bar.md',
-      slug: 'bar'
-    });
+    const post = await Post.insert({source : 'bar.md', slug : 'bar'});
     postPermalink(post).should.eql(hexo.config.default_category + '/bar/');
     Post.removeById(post._id);
   });
@@ -61,10 +54,7 @@ describe('post_permalink', () => {
   it('name', async () => {
     hexo.config.permalink = ':title/:name';
 
-    const post = await Post.insert({
-      source: 'sub/bar.md',
-      slug: 'sub/bar'
-    });
+    const post = await Post.insert({source : 'sub/bar.md', slug : 'sub/bar'});
     postPermalink(post).should.eql('sub/bar/bar');
     Post.removeById(post._id);
   });
@@ -73,10 +63,10 @@ describe('post_permalink', () => {
     hexo.config.permalink = ':year/:month/:day/:post_title/';
 
     const post = await Post.insert({
-      source: 'sub/2015-05-06-my-new-post.md',
-      slug: '2015-05-06-my-new-post',
-      title: 'My New Post',
-      date: moment('2015-05-06')
+      source : 'sub/2015-05-06-my-new-post.md',
+      slug : '2015-05-06-my-new-post',
+      title : 'My New Post',
+      date : moment('2015-05-06')
     });
     postPermalink(post).should.eql('2015/05/06/my-new-post/');
     Post.removeById(post._id);
@@ -86,10 +76,10 @@ describe('post_permalink', () => {
     hexo.config.permalink = ':year/:month/:day/:hour/:minute/:post_title/';
 
     const post = await Post.insert({
-      source: 'sub/2015-05-06-my-new-post.md',
-      slug: '2015-05-06-my-new-post',
-      title: 'My New Post',
-      date: moment('2015-05-06 12:13')
+      source : 'sub/2015-05-06-my-new-post.md',
+      slug : '2015-05-06-my-new-post',
+      title : 'My New Post',
+      date : moment('2015-05-06 12:13')
     });
     postPermalink(post).should.eql('2015/05/06/12/13/my-new-post/');
     Post.removeById(post._id);
@@ -99,10 +89,10 @@ describe('post_permalink', () => {
     hexo.config.permalink = ':year/:month/:day/:hour/:minute/:post_title/';
 
     const post = await Post.insert({
-      source: 'sub/2015-05-06-my-new-post.md',
-      slug: '2015-05-06-my-new-post',
-      title: 'My New Post',
-      date: moment('2015-05-06')
+      source : 'sub/2015-05-06-my-new-post.md',
+      slug : '2015-05-06-my-new-post',
+      title : 'My New Post',
+      date : moment('2015-05-06')
     });
     postPermalink(post).should.eql('2015/05/06/00/00/my-new-post/');
     Post.removeById(post._id);
@@ -110,18 +100,17 @@ describe('post_permalink', () => {
 
   it('permalink_defaults', async () => {
     hexo.config.permalink = 'posts/:lang/:title/';
-    hexo.config.permalink_defaults = {lang: 'en'};
+    hexo.config.permalink_defaults = {lang : 'en'};
 
-    const posts = await Post.insert([{
-      source: 'my-new-post.md',
-      slug: 'my-new-post',
-      title: 'My New Post1'
-    }, {
-      source: 'my-new-fr-post.md',
-      slug: 'my-new-fr-post',
-      title: 'My New Post2',
-      lang: 'fr'
-    }]);
+    const posts = await Post.insert([
+      {source : 'my-new-post.md', slug : 'my-new-post', title : 'My New Post1'},
+      {
+        source : 'my-new-fr-post.md',
+        slug : 'my-new-fr-post',
+        title : 'My New Post2',
+        lang : 'fr'
+      }
+    ]);
     postPermalink(posts[0]).should.eql('posts/en/my-new-post/');
     postPermalink(posts[1]).should.eql('posts/fr/my-new-fr-post/');
 
@@ -132,17 +121,20 @@ describe('post_permalink', () => {
     hexo.config.permalink = 'posts/:lang/:title/';
     hexo.config.permalink_defaults = null;
 
-    const posts = await Post.insert([{
-      source: 'my-new-post.md',
-      slug: 'my-new-post',
-      title: 'My New Post1',
-      lang: 'en'
-    }, {
-      source: 'my-new-post-2.md',
-      slug: 'my-new-post-2',
-      title: 'My New Post2',
-      lang: 'fr'
-    }]);
+    const posts = await Post.insert([
+      {
+        source : 'my-new-post.md',
+        slug : 'my-new-post',
+        title : 'My New Post1',
+        lang : 'en'
+      },
+      {
+        source : 'my-new-post-2.md',
+        slug : 'my-new-post-2',
+        title : 'My New Post2',
+        lang : 'fr'
+      }
+    ]);
     postPermalink(posts[0]).should.eql('posts/en/my-new-post/');
     postPermalink(posts[1]).should.eql('posts/fr/my-new-post-2/');
 

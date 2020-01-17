@@ -1,9 +1,10 @@
 'use strict';
 
-const { join } = require('path');
-const { emptyDir, exists, mkdirs, readFile, rmdir, stat, unlink, writeFile } = require('hexo-fs');
+const {join} = require('path');
+const {emptyDir, exists, mkdirs, readFile, rmdir, stat, unlink, writeFile} =
+    require('hexo-fs');
 const Promise = require('bluebird');
-const { spy } = require('sinon');
+const {spy} = require('sinon');
 
 describe('generate', () => {
   const Hexo = require('../../../lib/hexo');
@@ -11,7 +12,7 @@ describe('generate', () => {
   let hexo, generate;
 
   beforeEach(async () => {
-    hexo = new Hexo(join(__dirname, 'generate_test'), {silent: true});
+    hexo = new Hexo(join(__dirname, 'generate_test'), {silent : true});
     generate = generateConsole.bind(hexo);
 
     await mkdirs(hexo.base_dir);
@@ -77,10 +78,7 @@ describe('generate', () => {
     result.should.eql(content);
 
     // Remove source files and generated files
-    await Promise.all([
-      unlink(src),
-      unlink(dest)
-    ]);
+    await Promise.all([ unlink(src), unlink(dest) ]);
   });
 
   it('don\'t write if file unchanged', async () => {
@@ -108,10 +106,7 @@ describe('generate', () => {
     result.should.eql(newContent);
 
     // Remove source files and generated files
-    await Promise.all([
-      unlink(src),
-      unlink(dest)
-    ]);
+    await Promise.all([ unlink(src), unlink(dest) ]);
   });
 
   it('force regenerate', async () => {
@@ -131,16 +126,13 @@ describe('generate', () => {
     await Promise.delay(1000);
 
     // Force regenerate
-    await generate({ force: true });
+    await generate({force : true});
     stats = await stat(dest);
 
     stats.mtime.getTime().should.above(mtime);
 
     // Remove source files and generated files
-    await Promise.all([
-      unlink(src),
-      unlink(dest)
-    ]);
+    await Promise.all([ unlink(src), unlink(dest) ]);
   });
 
   it('watch - update', async () => {
@@ -148,7 +140,7 @@ describe('generate', () => {
     const dest = join(hexo.public_dir, 'test.txt');
     const content = 'test';
 
-    await testGenerate({ watch: true });
+    await testGenerate({watch : true});
 
     // Update the file
     await writeFile(src, content);
@@ -168,11 +160,9 @@ describe('generate', () => {
 
     hexo.extend.deployer.register('test', deployer);
 
-    hexo.config.deploy = {
-      type: 'test'
-    };
+    hexo.config.deploy = {type : 'test'};
 
-    await generate({ deploy: true });
+    await generate({deploy : true});
 
     deployer.calledOnce.should.eql(true);
   });
@@ -209,69 +199,54 @@ describe('generate', () => {
   });
 
   it('proceeds after error when bail option is not set', async () => {
-    hexo.extend.renderer.register('err', 'html', () => Promise.reject(new Error('Testing unhandled exception')));
-    hexo.extend.generator.register('test_page', () =>
-      [
-        {
-          path: 'testing-path',
-          layout: 'post',
-          data: {}
-        }
-      ]
-    );
+    hexo.extend.renderer.register(
+        'err', 'html',
+        () => Promise.reject(new Error('Testing unhandled exception')));
+    hexo.extend.generator.register(
+        'test_page',
+        () => [{path : 'testing-path', layout : 'post', data : {}}]);
 
-    await Promise.all([
-      writeFile(join(hexo.theme_dir, 'layout', 'post.err'), 'post')
-    ]);
+    await Promise.all(
+        [ writeFile(join(hexo.theme_dir, 'layout', 'post.err'), 'post') ]);
     return generate();
   });
 
   it('proceeds after error when bail option is set to false', async () => {
-    hexo.extend.renderer.register('err', 'html', () => Promise.reject(new Error('Testing unhandled exception')));
-    hexo.extend.generator.register('test_page', () =>
-      [
-        {
-          path: 'testing-path',
-          layout: 'post',
-          data: {}
-        }
-      ]
-    );
+    hexo.extend.renderer.register(
+        'err', 'html',
+        () => Promise.reject(new Error('Testing unhandled exception')));
+    hexo.extend.generator.register(
+        'test_page',
+        () => [{path : 'testing-path', layout : 'post', data : {}}]);
 
-    await Promise.all([
-      writeFile(join(hexo.theme_dir, 'layout', 'post.err'), 'post')
-    ]);
-    return generate({ bail: false });
+    await Promise.all(
+        [ writeFile(join(hexo.theme_dir, 'layout', 'post.err'), 'post') ]);
+    return generate({bail : false});
   });
 
   it('breaks after error when bail option is set to true', async () => {
-    hexo.extend.renderer.register('err', 'html', () => Promise.reject(new Error('Testing unhandled exception')));
-    hexo.extend.generator.register('test_page', () =>
-      [
-        {
-          path: 'testing-path',
-          layout: 'post',
-          data: {}
-        }
-      ]
-    );
+    hexo.extend.renderer.register(
+        'err', 'html',
+        () => Promise.reject(new Error('Testing unhandled exception')));
+    hexo.extend.generator.register(
+        'test_page',
+        () => [{path : 'testing-path', layout : 'post', data : {}}]);
 
     const errorCallback = spy(err => {
       err.should.have.property('message', 'Testing unhandled exception');
     });
 
-    await Promise.all([
-      writeFile(join(hexo.theme_dir, 'layout', 'post.err'), 'post')
-    ]);
+    await Promise.all(
+        [ writeFile(join(hexo.theme_dir, 'layout', 'post.err'), 'post') ]);
 
-    return generate({ bail: true }).catch(errorCallback).finally(() => {
-      errorCallback.calledOnce.should.be.true;
-    });
+    return generate({bail : true})
+        .catch(errorCallback)
+        .finally(() => { errorCallback.calledOnce.should.be.true; });
   });
 
   it('should generate all files even when concurrency is set', async () => {
-    await generate({ concurrency: 1 });
-    return generate({ concurrency: 2 });
+    await generate({concurrency : 1});
+    return generate({concurrency : 2});
   });
 });
 
@@ -279,7 +254,7 @@ describe('generate', () => {
 describe('generate - watch (delete)', () => {
   const Hexo = require('../../../lib/hexo');
   const generateConsole = require('../../../lib/plugins/console/generate');
-  const hexo = new Hexo(join(__dirname, 'generate_test'), {silent: true});
+  const hexo = new Hexo(join(__dirname, 'generate_test'), {silent : true});
   const generate = generateConsole.bind(hexo);
 
   beforeEach(async () => {
@@ -323,7 +298,7 @@ describe('generate - watch (delete)', () => {
   };
 
   it('watch - delete', async () => {
-    await testGenerate({ watch: true });
+    await testGenerate({watch : true});
 
     await unlink(join(hexo.source_dir, 'test.txt'));
     await Promise.delay(300);

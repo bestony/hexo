@@ -2,7 +2,7 @@
 
 const moment = require('moment');
 const cheerio = require('cheerio');
-const { encodeURL } = require('hexo-util');
+const {encodeURL} = require('hexo-util');
 
 describe('open_graph', () => {
   const Hexo = require('../../../lib/hexo');
@@ -12,9 +12,7 @@ describe('open_graph', () => {
   const tag = require('hexo-util').htmlTag;
   const Post = hexo.model('Post');
 
-  function meta(options) {
-    return tag('meta', options);
-  }
+  function meta(options) { return tag('meta', options); }
 
   before(() => {
     hexo.config.permalink = ':title';
@@ -22,32 +20,31 @@ describe('open_graph', () => {
   });
 
   it('default', async () => {
-    let post = await Post.insert({
-      source: 'foo.md',
-      slug: 'bar'
-    });
-    await post.setTags(['optimize', 'web']);
+    let post = await Post.insert({source : 'foo.md', slug : 'bar'});
+    await post.setTags([ 'optimize', 'web' ]);
 
     post = await Post.findById(post._id);
 
-    const result = openGraph.call({
-      page: post,
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result =
+        openGraph.call({page : post, config : hexo.config, is_post : isPost});
 
     result.should.eql([
-      meta({property: 'og:type', content: 'website'}),
-      meta({property: 'og:title', content: hexo.config.title}),
-      meta({property: 'og:url'}),
-      meta({property: 'og:site_name', content: hexo.config.title}),
-      meta({property: 'og:locale', content: 'en_US'}),
-      meta({property: 'article:published_time', content: post.date.toISOString()}),
-      meta({property: 'article:modified_time', content: post.updated.toISOString()}),
-      meta({property: 'article:author', content: hexo.config.author}),
-      meta({property: 'article:tag', content: 'optimize'}),
-      meta({property: 'article:tag', content: 'web'}),
-      meta({name: 'twitter:card', content: 'summary'})
+      meta({property : 'og:type', content : 'website'}),
+      meta({property : 'og:title', content : hexo.config.title}),
+      meta({property : 'og:url'}),
+      meta({property : 'og:site_name', content : hexo.config.title}),
+      meta({property : 'og:locale', content : 'en_US'}), meta({
+        property : 'article:published_time',
+        content : post.date.toISOString()
+      }),
+      meta({
+        property : 'article:modified_time',
+        content : post.updated.toISOString()
+      }),
+      meta({property : 'article:author', content : hexo.config.author}),
+      meta({property : 'article:tag', content : 'optimize'}),
+      meta({property : 'article:tag', content : 'web'}),
+      meta({name : 'twitter:card', content : 'summary'})
     ].join('\n'));
 
     await Post.removeById(post._id);
@@ -55,84 +52,83 @@ describe('open_graph', () => {
 
   it('title - page', () => {
     const ctx = {
-      page: {title: 'Hello world'},
-      config: hexo.config,
-      is_post: isPost
+      page : {title : 'Hello world'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({property: 'og:title', content: ctx.page.title}));
+    result.should.contain(
+        meta({property : 'og:title', content : ctx.page.title}));
   });
 
   it('title - options', () => {
     const result = openGraph.call({
-      page: {title: 'Hello world'},
-      config: hexo.config,
-      is_post: isPost
-    }, {title: 'test'});
+      page : {title : 'Hello world'},
+      config : hexo.config,
+      is_post : isPost
+    },
+                                  {title : 'test'});
 
-    result.should.contain(meta({property: 'og:title', content: 'test'}));
+    result.should.contain(meta({property : 'og:title', content : 'test'}));
   });
 
   it('type - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {type: 'photo'});
+    const result = openGraph.call(
+        {page : {}, config : hexo.config, is_post : isPost}, {type : 'photo'});
 
-    result.should.contain(meta({property: 'og:type', content: 'photo'}));
+    result.should.contain(meta({property : 'og:type', content : 'photo'}));
   });
 
   it('type - is_post', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post() {
-        return true;
-      }
-    });
+    const result = openGraph.call(
+        {page : {}, config : hexo.config, is_post() { return true; }});
 
-    result.should.contain(meta({property: 'og:type', content: 'article'}));
+    result.should.contain(meta({property : 'og:type', content : 'article'}));
   });
 
   it('url - context', () => {
     const ctx = {
-      page: {},
-      config: hexo.config,
-      is_post: isPost,
-      url: 'https://hexo.io/foo'
+      page : {},
+      config : hexo.config,
+      is_post : isPost,
+      url : 'https://hexo.io/foo'
     };
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({property: 'og:url', content: ctx.url}));
+    result.should.contain(meta({property : 'og:url', content : ctx.url}));
   });
 
   it('url - options', () => {
     const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost,
-      url: 'https://hexo.io/foo'
-    }, {url: 'https://hexo.io/bar'});
+      page : {},
+      config : hexo.config,
+      is_post : isPost,
+      url : 'https://hexo.io/foo'
+    },
+                                  {url : 'https://hexo.io/bar'});
 
-    result.should.contain(meta({property: 'og:url', content: 'https://hexo.io/bar'}));
+    result.should.contain(
+        meta({property : 'og:url', content : 'https://hexo.io/bar'}));
   });
 
   it('url - pretty_urls.trailing_index', () => {
     hexo.config.pretty_urls.trailing_index = false;
     const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost,
-      url: 'http://yoursite.com/page/index.html'
+      page : {},
+      config : hexo.config,
+      is_post : isPost,
+      url : 'http://yoursite.com/page/index.html'
     });
 
     const $ = cheerio.load(result);
 
-    $('meta[property="og:url"]').attr('content').endsWith('index.html').should.eql(false);
+    $('meta[property="og:url"]')
+        .attr('content')
+        .endsWith('index.html')
+        .should.eql(false);
 
     hexo.config.pretty_urls.trailing_index = true;
   });
@@ -140,15 +136,18 @@ describe('open_graph', () => {
   it('url - pretty_urls.trailing_html', () => {
     hexo.config.pretty_urls.trailing_html = false;
     const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost,
-      url: 'http://yoursite.com/page/about.html'
+      page : {},
+      config : hexo.config,
+      is_post : isPost,
+      url : 'http://yoursite.com/page/about.html'
     });
 
     const $ = cheerio.load(result);
 
-    $('meta[property="og:url"]').attr('content').endsWith('.html').should.eql(false);
+    $('meta[property="og:url"]')
+        .attr('content')
+        .endsWith('.html')
+        .should.eql(false);
 
     hexo.config.pretty_urls.trailing_html = true;
   });
@@ -156,96 +155,82 @@ describe('open_graph', () => {
   it('url - null pretty_urls', () => {
     hexo.config.pretty_urls = null;
     const url = 'http://yoursite.com/page/about.html';
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost,
-      url
-    });
+    const result = openGraph.call(
+        {page : {}, config : hexo.config, is_post : isPost, url});
 
     const $ = cheerio.load(result);
 
     $('meta[property="og:url"]').attr('content').should.eql(url);
 
-    hexo.config.pretty_urls = {
-      trailing_index: true,
-      trailing_html: true
-    };
+    hexo.config.pretty_urls = {trailing_index : true, trailing_html : true};
   });
 
   it('url - IDN', () => {
     const ctx = {
-      page: {},
-      config: hexo.config,
-      is_post: isPost,
-      url: 'https://foô.com/bár'
+      page : {},
+      config : hexo.config,
+      is_post : isPost,
+      url : 'https://foô.com/bár'
     };
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({property: 'og:url', content: encodeURL(ctx.url)}));
+    result.should.contain(
+        meta({property : 'og:url', content : encodeURL(ctx.url)}));
   });
 
   it('images - content', () => {
     const result = openGraph.call({
-      page: {
-        content: [
-          '<p>123456789</p>',
-          '<img src="https://hexo.io/test.jpg">',
-          '<img src="">',
-          '<img class="img">'
+      page : {
+        content : [
+          '<p>123456789</p>', '<img src="https://hexo.io/test.jpg">',
+          '<img src="">', '<img class="img">'
         ].join('')
       },
-      config: hexo.config,
-      is_post: isPost
+      config : hexo.config,
+      is_post : isPost
     });
 
-    result.should.contain(meta({property: 'og:image', content: 'https://hexo.io/test.jpg'}));
+    result.should.contain(
+        meta({property : 'og:image', content : 'https://hexo.io/test.jpg'}));
   });
 
   it('images - string', () => {
     const result = openGraph.call({
-      page: {
-        photos: 'https://hexo.io/test.jpg'
-      },
-      config: hexo.config,
-      is_post: isPost
+      page : {photos : 'https://hexo.io/test.jpg'},
+      config : hexo.config,
+      is_post : isPost
     });
 
-    result.should.contain(meta({property: 'og:image', content: 'https://hexo.io/test.jpg'}));
+    result.should.contain(
+        meta({property : 'og:image', content : 'https://hexo.io/test.jpg'}));
   });
 
   it('images - array', () => {
     const result = openGraph.call({
-      page: {
-        photos: [
-          'https://hexo.io/foo.jpg',
-          'https://hexo.io/bar.jpg'
-        ]
-      },
-      config: hexo.config,
-      is_post: isPost
+      page :
+          {photos : [ 'https://hexo.io/foo.jpg', 'https://hexo.io/bar.jpg' ]},
+      config : hexo.config,
+      is_post : isPost
     });
 
     result.should.contain([
-      meta({property: 'og:image', content: 'https://hexo.io/foo.jpg'}),
-      meta({property: 'og:image', content: 'https://hexo.io/bar.jpg'})
+      meta({property : 'og:image', content : 'https://hexo.io/foo.jpg'}),
+      meta({property : 'og:image', content : 'https://hexo.io/bar.jpg'})
     ].join('\n'));
   });
 
   it('images - don\'t pollute context', () => {
     const ctx = {
-      page: {
-        content: [
-          '<p>123456789</p>',
-          '<img src="https://hexo.io/test.jpg">',
-          '<img src="">',
-          '<img class="img">'
+      page : {
+        content : [
+          '<p>123456789</p>', '<img src="https://hexo.io/test.jpg">',
+          '<img src="">', '<img class="img">'
         ].join(''),
-        photos: []
+        photos : []
       },
-      config: hexo.config,
-      is_post: isPost
+      config : hexo.config,
+      is_post : isPost
     };
 
     openGraph.call(ctx);
@@ -253,506 +238,487 @@ describe('open_graph', () => {
   });
 
   it('images - options.image', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {image: 'https://hexo.io/test.jpg'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {image : 'https://hexo.io/test.jpg'});
 
-    result.should.contain(meta({property: 'og:image', content: 'https://hexo.io/test.jpg'}));
+    result.should.contain(
+        meta({property : 'og:image', content : 'https://hexo.io/test.jpg'}));
   });
 
   it('images - options.images', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {images: 'https://hexo.io/test.jpg'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {images : 'https://hexo.io/test.jpg'});
 
-    result.should.contain(meta({property: 'og:image', content: 'https://hexo.io/test.jpg'}));
+    result.should.contain(
+        meta({property : 'og:image', content : 'https://hexo.io/test.jpg'}));
   });
 
   it('images - prepend config.url to the path (without prefixing /)', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {images: 'test.jpg'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {images : 'test.jpg'});
 
-    result.should.contain(meta({property: 'og:image', content: hexo.config.url + '/test.jpg'}));
+    result.should.contain(
+        meta({property : 'og:image', content : hexo.config.url + '/test.jpg'}));
   });
 
   it('images - prepend config.url to the path (with prefixing /)', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {images: '/test.jpg'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {images : '/test.jpg'});
 
-    result.should.contain(meta({property: 'og:image', content: hexo.config.url + '/test.jpg'}));
+    result.should.contain(
+        meta({property : 'og:image', content : hexo.config.url + '/test.jpg'}));
   });
 
-  it('images - resolve relative path when site is hosted in subdirectory', () => {
-    const urlFn = require('url');
-    const config = hexo.config;
-    config.url = urlFn.resolve(config.url, 'blog');
-    config.root = 'blog';
-    const postUrl = urlFn.resolve(config.url, '/foo/bar/index.html');
+  it('images - resolve relative path when site is hosted in subdirectory',
+     () => {
+       const urlFn = require('url');
+       const config = hexo.config;
+       config.url = urlFn.resolve(config.url, 'blog');
+       config.root = 'blog';
+       const postUrl = urlFn.resolve(config.url, '/foo/bar/index.html');
 
-    const result = openGraph.call({
-      page: {},
-      config,
-      is_post: isPost,
-      url: postUrl
-    }, {images: 'test.jpg'});
+       const result =
+           openGraph.call({page : {}, config, is_post : isPost, url : postUrl},
+                          {images : 'test.jpg'});
 
-    result.should.contain(meta({property: 'og:image', content: urlFn.resolve(config.url, '/foo/bar/test.jpg')}));
-  });
+       result.should.contain(meta({
+         property : 'og:image',
+         content : urlFn.resolve(config.url, '/foo/bar/test.jpg')
+       }));
+     });
 
   it('site_name - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {site_name: 'foo'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {site_name : 'foo'});
 
-    result.should.contain(meta({property: 'og:site_name', content: 'foo'}));
+    result.should.contain(meta({property : 'og:site_name', content : 'foo'}));
   });
 
   it('description - page', () => {
     const ctx = {
-      page: {description: 'test'},
-      config: hexo.config,
-      is_post: isPost
+      page : {description : 'test'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({name: 'description', content: ctx.page.description}));
-    result.should.contain(meta({property: 'og:description', content: ctx.page.description}));
+    result.should.contain(
+        meta({name : 'description', content : ctx.page.description}));
+    result.should.contain(
+        meta({property : 'og:description', content : ctx.page.description}));
   });
 
   it('description - options', () => {
     const ctx = {
-      page: {description: 'test'},
-      config: hexo.config,
-      is_post: isPost
+      page : {description : 'test'},
+      config : hexo.config,
+      is_post : isPost
     };
 
-    const result = openGraph.call(ctx, {description: 'foo'});
+    const result = openGraph.call(ctx, {description : 'foo'});
 
-    result.should.contain(meta({name: 'description', content: 'foo'}));
-    result.should.contain(meta({property: 'og:description', content: 'foo'}));
+    result.should.contain(meta({name : 'description', content : 'foo'}));
+    result.should.contain(meta({property : 'og:description', content : 'foo'}));
   });
 
   it('description - excerpt', () => {
     const ctx = {
-      page: {excerpt: 'test'},
-      config: hexo.config,
-      is_post: isPost
+      page : {excerpt : 'test'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({name: 'description', content: ctx.page.excerpt}));
-    result.should.contain(meta({property: 'og:description', content: ctx.page.excerpt}));
+    result.should.contain(
+        meta({name : 'description', content : ctx.page.excerpt}));
+    result.should.contain(
+        meta({property : 'og:description', content : ctx.page.excerpt}));
   });
 
   it('description - content', () => {
     const ctx = {
-      page: {content: 'test'},
-      config: hexo.config,
-      is_post: isPost
+      page : {content : 'test'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({name: 'description', content: ctx.page.content}));
-    result.should.contain(meta({property: 'og:description', content: ctx.page.content}));
+    result.should.contain(
+        meta({name : 'description', content : ctx.page.content}));
+    result.should.contain(
+        meta({property : 'og:description', content : ctx.page.content}));
   });
 
   it('description - config', () => {
-    const ctx = {
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    };
+    const ctx = {page : {}, config : hexo.config, is_post : isPost};
 
     hexo.config.description = 'test';
 
     const result = openGraph.call(ctx);
 
-    result.should.contain(meta({name: 'description', content: hexo.config.description}));
-    result.should.contain(meta({property: 'og:description', content: hexo.config.description}));
+    result.should.contain(
+        meta({name : 'description', content : hexo.config.description}));
+    result.should.contain(
+        meta({property : 'og:description', content : hexo.config.description}));
 
     hexo.config.description = '';
   });
 
   it('description - escape', () => {
     const ctx = {
-      page: {description: '<b>Important!</b> Today is "not" \'Xmas\'!'},
-      config: hexo.config,
-      is_post: isPost
+      page : {description : '<b>Important!</b> Today is "not" \'Xmas\'!'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
     const escaped = 'Important! Today is &quot;not&quot; &#39;Xmas&#39;!';
 
-    result.should.contain(meta({name: 'description', content: escaped}));
-    result.should.contain(meta({property: 'og:description', content: escaped}));
+    result.should.contain(meta({name : 'description', content : escaped}));
+    result.should.contain(
+        meta({property : 'og:description', content : escaped}));
   });
 
   it('twitter_card - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {twitter_card: 'photo'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {twitter_card : 'photo'});
 
-    result.should.contain(meta({name: 'twitter:card', content: 'photo'}));
+    result.should.contain(meta({name : 'twitter:card', content : 'photo'}));
   });
 
   it('twitter_id - options (without prefixing @)', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {twitter_id: 'hexojs'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {twitter_id : 'hexojs'});
 
-    result.should.contain(meta({name: 'twitter:creator', content: '@hexojs'}));
+    result.should.contain(
+        meta({name : 'twitter:creator', content : '@hexojs'}));
   });
 
   it('twitter_id - options (with prefixing @)', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {twitter_id: '@hexojs'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {twitter_id : '@hexojs'});
 
-    result.should.contain(meta({name: 'twitter:creator', content: '@hexojs'}));
+    result.should.contain(
+        meta({name : 'twitter:creator', content : '@hexojs'}));
   });
 
   it('twitter_site - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {twitter_site: 'Hello'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {twitter_site : 'Hello'});
 
-    result.should.contain(meta({name: 'twitter:site', content: 'Hello'}));
+    result.should.contain(meta({name : 'twitter:site', content : 'Hello'}));
   });
 
   it('google_plus - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {google_plus: '+123456789'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {google_plus : '+123456789'});
 
-    result.should.contain(tag('link', {rel: 'publisher', href: '+123456789'}));
+    result.should.contain(
+        tag('link', {rel : 'publisher', href : '+123456789'}));
   });
 
   it('fb_admins - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {fb_admins: '123456789'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {fb_admins : '123456789'});
 
-    result.should.contain(meta({property: 'fb:admins', content: '123456789'}));
+    result.should.contain(
+        meta({property : 'fb:admins', content : '123456789'}));
   });
 
   it('fb_app_id - options', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {fb_app_id: '123456789'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {fb_app_id : '123456789'});
 
-    result.should.contain(meta({property: 'fb:app_id', content: '123456789'}));
+    result.should.contain(
+        meta({property : 'fb:app_id', content : '123456789'}));
   });
 
   it('updated - options', () => {
     const result = openGraph.call({
-      page: { updated: moment('2016-05-23T21:20:21.372Z') },
-      config: hexo.config,
-      is_post: isPost
-    }, { });
+      page : {updated : moment('2016-05-23T21:20:21.372Z')},
+      config : hexo.config,
+      is_post : isPost
+    },
+                                  {});
 
-    result.should.contain(meta({property: 'article:modified_time', content: '2016-05-23T21:20:21.372Z'}));
+    result.should.contain(meta({
+      property : 'article:modified_time',
+      content : '2016-05-23T21:20:21.372Z'
+    }));
   });
 
   it('updated - options - allow overriding article:modified_time', () => {
-    const result = openGraph.call({
-      page: { updated: moment('2016-05-23T21:20:21.372Z') },
-      config: hexo.config,
-      is_post: isPost
-    }, { updated: moment('2015-04-22T20:19:20.371Z') });
+    const result =
+        openGraph.call({
+          page : {updated : moment('2016-05-23T21:20:21.372Z')},
+          config : hexo.config,
+          is_post : isPost
+        },
+                       {updated : moment('2015-04-22T20:19:20.371Z')});
 
-    result.should.contain(meta({property: 'article:modified_time', content: '2015-04-22T20:19:20.371Z'}));
+    result.should.contain(meta({
+      property : 'article:modified_time',
+      content : '2015-04-22T20:19:20.371Z'
+    }));
   });
 
   it('updated - options - allow disabling article:modified_time', () => {
     const result = openGraph.call({
-      page: { updated: moment('2016-05-23T21:20:21.372Z') },
-      config: hexo.config,
-      is_post: isPost
-    }, { updated: false });
+      page : {updated : moment('2016-05-23T21:20:21.372Z')},
+      config : hexo.config,
+      is_post : isPost
+    },
+                                  {updated : false});
 
-    result.should.not.contain(meta({property: 'article:modified_time', content: '2016-05-23T21:20:21.372Z'}));
+    result.should.not.contain(meta({
+      property : 'article:modified_time',
+      content : '2016-05-23T21:20:21.372Z'
+    }));
   });
 
-  it('description - do not add /(?:og:)?description/ meta tags if there is no description', () => {
-    const result = openGraph.call({
-      page: { },
-      config: hexo.config,
-      is_post: isPost
-    }, { });
+  it('description - do not add /(?:og:)?description/ meta tags if there is no description',
+     () => {
+       const result = openGraph.call(
+           {page : {}, config : hexo.config, is_post : isPost}, {});
 
-    result.should.not.contain(meta({property: 'og:description'}));
-    result.should.not.contain(meta({property: 'description'}));
-  });
+       result.should.not.contain(meta({property : 'og:description'}));
+       result.should.not.contain(meta({property : 'description'}));
+     });
 
   it('keywords - page keywords string', () => {
     const ctx = {
-      page: { keywords: 'optimize,web' },
-      config: hexo.config,
-      is_post: isPost
+      page : {keywords : 'optimize,web'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
-    const escaped = ['optimize', 'web'];
+    const escaped = [ 'optimize', 'web' ];
 
-    result.should.contain(meta({property: 'article:tag', content: escaped[0]}));
-    result.should.contain(meta({property: 'article:tag', content: escaped[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : escaped[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : escaped[1]}));
   });
 
   it('keywords - page keywords array', () => {
     const ctx = {
-      page: { keywords: ['optimize', 'web'] },
-      config: hexo.config,
-      is_post: isPost
+      page : {keywords : [ 'optimize', 'web' ]},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
-    const keywords = ['optimize', 'web'];
+    const keywords = [ 'optimize', 'web' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - page tags', () => {
     const ctx = {
-      page: { tags: ['optimize', 'web'] },
-      config: hexo.config,
-      is_post: isPost
+      page : {tags : [ 'optimize', 'web' ]},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
-    const keywords = ['optimize', 'web'];
+    const keywords = [ 'optimize', 'web' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - config keywords string', () => {
     hexo.config.keywords = 'optimize,web';
-    const ctx = {
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    };
+    const ctx = {page : {}, config : hexo.config, is_post : isPost};
 
     const result = openGraph.call(ctx);
-    const keywords = ['optimize', 'web'];
+    const keywords = [ 'optimize', 'web' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - config keywords array', () => {
-    hexo.config.keywords = ['optimize', 'web'];
-    const ctx = {
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    };
+    hexo.config.keywords = [ 'optimize', 'web' ];
+    const ctx = {page : {}, config : hexo.config, is_post : isPost};
 
     const result = openGraph.call(ctx);
-    const keywords = ['optimize', 'web'];
+    const keywords = [ 'optimize', 'web' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - page keywords first', () => {
     hexo.config.keywords = 'web5,web6';
     const ctx = {
-      page: {
-        keywords: ['web1', 'web2'],
-        tags: ['web3', 'web4']
-      },
-      config: hexo.config,
-      is_post: isPost
+      page : {keywords : [ 'web1', 'web2' ], tags : [ 'web3', 'web4' ]},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
-    const keywords = ['web1', 'web2'];
+    const keywords = [ 'web1', 'web2' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - page tags second', () => {
     hexo.config.keywords = 'web5,web6';
     const ctx = {
-      page: { tags: ['optimize', 'web'] },
-      config: hexo.config,
-      is_post: isPost
+      page : {tags : [ 'optimize', 'web' ]},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
-    const keywords = ['optimize', 'web'];
+    const keywords = [ 'optimize', 'web' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - page tags empty', () => {
     hexo.config.keywords = 'web5,web6';
-    const ctx = {
-      page: { tags: [] },
-      config: hexo.config,
-      is_post: isPost
-    };
+    const ctx = {page : {tags : []}, config : hexo.config, is_post : isPost};
 
     const result = openGraph.call(ctx);
-    const keywords = ['web5', 'web6'];
+    const keywords = [ 'web5', 'web6' ];
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
   });
 
   it('keywords - escape', () => {
     const ctx = {
-      page: { keywords: 'optimize,web&<>"\'/,site' },
-      config: hexo.config,
-      is_post: isPost
+      page : {keywords : 'optimize,web&<>"\'/,site'},
+      config : hexo.config,
+      is_post : isPost
     };
 
     const result = openGraph.call(ctx);
-    const keywords = 'optimize,web&amp;&lt;&gt;&quot;&#39;&#x2F;,site'.split(',');
+    const keywords =
+        'optimize,web&amp;&lt;&gt;&quot;&#39;&#x2F;,site'.split(',');
 
-    result.should.contain(meta({property: 'article:tag', content: keywords[0]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[1]}));
-    result.should.contain(meta({property: 'article:tag', content: keywords[2]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[0]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[1]}));
+    result.should.contain(
+        meta({property : 'article:tag', content : keywords[2]}));
   });
 
   it('og:locale - options.language', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {language: 'es-cr'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {language : 'es-cr'});
 
-    result.should.contain(meta({property: 'og:locale', content: 'es_CR'}));
+    result.should.contain(meta({property : 'og:locale', content : 'es_CR'}));
   });
 
   it('og:locale - page.lang', () => {
-    const result = openGraph.call({
-      page: { lang: 'es-mx' },
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result = openGraph.call(
+        {page : {lang : 'es-mx'}, config : hexo.config, is_post : isPost});
 
-    result.should.contain(meta({property: 'og:locale', content: 'es_MX'}));
+    result.should.contain(meta({property : 'og:locale', content : 'es_MX'}));
   });
 
   it('og:locale - page.language', () => {
-    const result = openGraph.call({
-      page: { language: 'es-gt' },
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result = openGraph.call(
+        {page : {language : 'es-gt'}, config : hexo.config, is_post : isPost});
 
-    result.should.contain(meta({property: 'og:locale', content: 'es_GT'}));
+    result.should.contain(meta({property : 'og:locale', content : 'es_GT'}));
   });
 
   it('og:locale - config.language', () => {
     hexo.config.language = 'es-pa';
 
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost});
 
-    result.should.contain(meta({property: 'og:locale', content: 'es_PA'}));
+    result.should.contain(meta({property : 'og:locale', content : 'es_PA'}));
   });
 
   it('og:locale - convert territory to uppercase', () => {
     hexo.config.language = 'fr-fr';
 
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost});
 
-    result.should.contain(meta({property: 'og:locale', content: 'fr_FR'}));
+    result.should.contain(meta({property : 'og:locale', content : 'fr_FR'}));
   });
 
   it('og:locale - no language set', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost});
 
-    result.should.not.contain(meta({property: 'og:locale'}));
+    result.should.not.contain(meta({property : 'og:locale'}));
   });
 
   it('og:locale - language is not in lang-TERRITORY format', () => {
     hexo.config.language = 'en';
 
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost});
 
-    result.should.contain(meta({property: 'og:locale', content: 'en_US'}));
+    result.should.contain(meta({property : 'og:locale', content : 'en_US'}));
   });
 
   it('article:author - options.author', () => {
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    }, {author: 'Jane Doe'});
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost},
+                       {author : 'Jane Doe'});
 
-    result.should.contain(meta({property: 'article:author', content: 'Jane Doe'}));
+    result.should.contain(
+        meta({property : 'article:author', content : 'Jane Doe'}));
   });
 
   it('article:author - config.language', () => {
     hexo.config.language = 'es-pa';
 
-    const result = openGraph.call({
-      page: {},
-      config: hexo.config,
-      is_post: isPost
-    });
+    const result =
+        openGraph.call({page : {}, config : hexo.config, is_post : isPost});
 
-    result.should.contain(meta({property: 'article:author', content: 'John Doe'}));
+    result.should.contain(
+        meta({property : 'article:author', content : 'John Doe'}));
   });
 
   it('article:author - no author set', () => {
-    const result = openGraph.call({
-      page: {},
-      config: { author: undefined },
-      is_post: isPost
-    });
+    const result = openGraph.call(
+        {page : {}, config : {author : undefined}, is_post : isPost});
 
-    result.should.not.contain(meta({property: 'article:author'}));
+    result.should.not.contain(meta({property : 'article:author'}));
   });
 });

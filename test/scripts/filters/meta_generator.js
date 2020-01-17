@@ -3,7 +3,9 @@
 describe('Meta Generator', () => {
   const Hexo = require('../../../lib/hexo');
   const hexo = new Hexo();
-  const metaGenerator = require('../../../lib/plugins/filter/after_render/meta_generator').bind(hexo);
+  const metaGenerator =
+      require('../../../lib/plugins/filter/after_render/meta_generator')
+          .bind(hexo);
   const cheerio = require('cheerio');
 
   it('default', () => {
@@ -12,7 +14,9 @@ describe('Meta Generator', () => {
 
     const $ = cheerio.load(result);
     $('meta[name="generator"]').length.should.eql(1);
-    $('meta[name="generator"]').attr('content').should.eql(`Hexo ${hexo.version}`);
+    $('meta[name="generator"]')
+        .attr('content')
+        .should.eql(`Hexo ${hexo.version}`);
   });
 
   it('disable meta_generator', () => {
@@ -28,8 +32,10 @@ describe('Meta Generator', () => {
     hexo.config.meta_generator = true;
     const resultType = str => typeof metaGenerator(str);
 
-    resultType('<head><link><meta name="generator" content="foo"></head>').should.eql('undefined');
-    resultType('<head><link><meta content="foo" name="generator"></head>').should.eql('undefined');
+    resultType('<head><link><meta name="generator" content="foo"></head>')
+        .should.eql('undefined');
+    resultType('<head><link><meta content="foo" name="generator"></head>')
+        .should.eql('undefined');
   });
 
   it('ignore empty head tag', () => {
@@ -40,8 +46,9 @@ describe('Meta Generator', () => {
     const $ = cheerio.load(result);
     $('meta[name="generator"]').length.should.eql(1);
 
-    const expected = '<head></head><head><link><meta name="generator" content="Hexo '
-      + hexo.version + '"></head><head></head>';
+    const expected =
+        '<head></head><head><link><meta name="generator" content="Hexo ' +
+        hexo.version + '"></head><head></head>';
     result.should.eql(expected);
   });
 
@@ -53,8 +60,9 @@ describe('Meta Generator', () => {
     const $ = cheerio.load(result);
     $('meta[name="generator"]').length.should.eql(1);
 
-    const expected = '<head></head><head><link><meta name="generator" content="Hexo '
-      + hexo.version + '"></head><head><link></head>';
+    const expected =
+        '<head></head><head><link><meta name="generator" content="Hexo ' +
+        hexo.version + '"></head><head><link></head>';
     result.should.eql(expected);
   });
 
@@ -67,7 +75,8 @@ describe('Meta Generator', () => {
     const $ = cheerio.load(result);
     $('meta[name="generator"]').length.should.eql(1);
 
-    const expected = '<head>\n<link>\n<meta name="generator" content="Hexo ' + hexo.version + '"></head>';
+    const expected = '<head>\n<link>\n<meta name="generator" content="Hexo ' +
+                     hexo.version + '"></head>';
 
     result.should.eql(expected);
   });
