@@ -17,14 +17,14 @@ LOG_TABLE () {
 
     memory_usage=$(awk '/.*Maximum resident set size/{print $6}' build.log)
 
-    echo "Load Plugin/Scripts/Database $(_SUBSTRUCTION $time_process_start $time_begin)s" | _MESSAGE_FORMATTER
-    echo "Process Source $(_SUBSTRUCTION $time_render_start $time_process_start)s" | _MESSAGE_FORMATTER
-    echo "Render Files $(_SUBSTRUCTION $time_render_finish $time_render_start)s" | _MESSAGE_FORMATTER
-    echo "Save Database $(_SUBSTRUCTION $time_database_saved $time_render_finish)s" | _MESSAGE_FORMATTER
-    echo "Total time $(_SUBSTRUCTION $time_database_saved $time_begin)s" | _MESSAGE_FORMATTER
+    echo "Load Plugin/Scripts/Database $(_SUBSTRUCTION "$time_process_start" "$time_begin")s" | _MESSAGE_FORMATTER
+    echo "Process Source $(_SUBSTRUCTION "$time_render_start" "$time_process_start")s" | _MESSAGE_FORMATTER
+    echo "Render Files $(_SUBSTRUCTION "$time_render_finish" "$time_render_start")s" | _MESSAGE_FORMATTER
+    echo "Save Database $(_SUBSTRUCTION "$time_database_saved" "$time_render_finish")s" | _MESSAGE_FORMATTER
+    echo "Total time $(_SUBSTRUCTION "$time_database_saved" "$time_begin")s" | _MESSAGE_FORMATTER
     echo "Memory Usage(RSS) $(echo | awk "{printf \"%.3f\", $memory_usage/1024}")MB" | _MESSAGE_FORMATTER
 
-    total_time=$(_SUBSTRUCTION $time_database_saved $time_begin | xargs -0 printf "%.0f")
+    total_time=$(_SUBSTRUCTION "$time_database_saved" "$time_begin" | xargs -0 printf "%.0f")
     line_number=$(wc -l build.log | cut -d" " -f1)
 
     if [ "$1" != "HOT" ]; then
@@ -46,7 +46,7 @@ LOG_TABLE () {
 echo "============== Hexo Benchmark =============="
 
 echo "- Set up dummy Hexo site"
-cd $TRAVIS_BUILD_DIR
+cd "$TRAVIS_BUILD_DIR"
 cd ..
 git clone https://github.com/hexojs/hexo-theme-unit-test.git --depth=1 --quiet
 cd hexo-theme-unit-test
@@ -63,7 +63,7 @@ rm -rf source/_posts/hexo-many-posts/.git/
 
 echo "- Replace node_modules/hexo"
 rm -rf node_modules/hexo
-ln -sf $TRAVIS_BUILD_DIR node_modules/hexo
+ln -sf "$TRAVIS_BUILD_DIR" node_modules/hexo
 
 echo "- Start test run"
 echo ""
@@ -87,9 +87,9 @@ npx --no-install hexo clean > build.log
 echo ""
 echo "- Generating flamegraph..."
 
-node ./node_modules/.bin/0x --output-dir "${TRAVIS_BUILD_DIR}/0x" -- node ./node_modules/.bin/hexo g > build.log 2>&1 ;
+node ./node_modules/.bin/0x --output-dir "$TRAVIS_BUILD_DIR/0x" -- node ./node_modules/.bin/hexo g > build.log 2>&1 ;
 
-echo "Flamegraph will be deployed to: https://${TRAVIS_COMMIT}-${TRAVIS_NODE_VERSION}-hexo.surge.sh/flamegraph.html"
+echo "Flamegraph will be deployed to: https://$TRAVIS_COMMIT-$TRAVIS_NODE_VERSION-hexo.surge.sh/flamegraph.html"
 
 rm -rf build.log
-cd $TRAVIS_BUILD_DIR
+cd "$TRAVIS_BUILD_DIR"
